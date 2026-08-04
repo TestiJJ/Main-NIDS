@@ -1,0 +1,10 @@
+capture.pcap
+*.log
+sensor_config.json
+serviceAccountKey.json
+capture.pcap
+*.pcap
+*.log
+eve.json
+sensor_config.json
+serviceAccountKey.json

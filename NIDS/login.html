@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIDS | Management Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    
+    <!-- Firebase Core and Components (Compat SDKs) -->
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.0/firebase-auth-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { --wine: #800020; --wine-bright: #b3002d; }
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; scroll-behavior: smooth; }
+        .font-cyber { font-family: 'Space Grotesk', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(128, 0, 32, 0.2); }
+        .alert-row { border-left: 4px solid var(--wine); transition: 0.3s; animation: fadeIn 0.5s ease-out; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Auth Overlay Screen */
+        #auth-overlay { position: fixed; inset: 0; background: #020617; z-index: 200; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+
+    <!-- ================= AUTHENTICATION OVERLAY ================= -->
+    <div id="auth-overlay">
+        <div class="glass p-8 rounded-3xl max-w-md w-full border-t-4 border-red-700 shadow-2xl mx-4">
+            <div class="flex items-center gap-2 justify-center mb-6">
+                <i class="fas fa-shield-virus text-red-700 text-3xl"></i>
+                <span class="text-2xl font-bold font-cyber tracking-tighter uppercase">Project <span class="text-red-700">NIDS</span></span>
+            </div>
+            
+            <h3 id="auth-title" class="text-center text-sm font-cyber uppercase tracking-widest text-slate-400 mb-6">Secure Administrator Access</h3>
+            
+            <!-- Error Banner -->
+            <div id="auth-error" class="hidden text-xs bg-red-950/40 border border-red-900 text-red-400 p-3 rounded-xl mb-4 text-center font-medium"></div>
+            
+            <!-- Success / Verification Info Banner -->
+            <div id="auth-success" class="hidden text-xs bg-emerald-950/40 border border-emerald-800 text-emerald-400 p-3 rounded-xl mb-4 text-center font-medium"></div>
+
+            <form id="auth-form" class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Email Address</label>
+                    <input type="email" id="auth-email" required class="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-800 transition">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Password (Min 8 Characters)</label>
+                    <div class="relative">
+                        <input type="password" id="auth-password" minlength="8" required class="w-full bg-slate-900/60 border border-slate-800 rounded-xl pl-4 pr-10 py-3 text-sm text-white focus:outline-none focus:border-red-800 transition">
+                        <button type="button" id="toggle-password-visibility" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition focus:outline-none">
+                            <i id="password-toggle-icon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" id="auth-submit-btn" class="w-full bg-red-950/60 border border-red-900/50 py-3 rounded-xl font-bold hover:bg-red-900 text-white transition uppercase text-xs tracking-widest mt-2">
+                    Authorize Login
+                </button>
+            </form>
+
+            <div class="text-center mt-6">
+                <button id="toggle-auth-mode" type="button" class="text-xs text-slate-400 hover:text-red-400 transition underline decoration-dotted">
+                    Need a monitoring account? Sign Up instead
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MAIN DASHBOARD UI (HIDDEN UNTIL AUTHENTICATED) ================= -->
+    <div id="dashboard-root" class="w-full flex min-h-screen opacity-0 transition-opacity duration-500 pointer-events-none">
+        <aside class="w-64 glass border-r border-red-900/30 hidden md:flex flex-col p-6 sticky top-0 h-screen">
+            <div class="flex items-center gap-2 mb-10">
+                <i class="fas fa-shield-virus text-red-700 text-2xl"></i>
+                <span class="text-xl font-bold font-cyber tracking-tighter uppercase">Project <span class="text-red-700">NIDS</span></span>
+            </div>
+            <nav class="space-y-4 flex-1 text-sm">
+                <a href="#overview" class="flex items-center gap-3 p-3 bg-red-900/20 text-white rounded-lg border border-red-900/50 transition">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="#logs" class="flex items-center gap-3 p-3 text-slate-400 hover:text-white transition">
+                    <i class="fas fa-list"></i> Detailed Logs
+                </a>
+                <a href="#rules" class="flex items-center gap-3 p-3 text-slate-400 hover:text-white transition">
+                    <i class="fas fa-cog"></i> System Rules
+                </a>
+            </nav>
+            <div class="pt-6 border-t border-slate-800 flex flex-col gap-4">
+                <div class="text-[10px] text-slate-500 uppercase tracking-widest">
+                    Sensor Status: <span class="text-green-500 animate-pulse">● Online</span>
+                </div>
+                <button onclick="handleSignOut()" class="w-full text-left flex items-center gap-2 text-xs text-slate-400 hover:text-red-500 transition font-bold uppercase tracking-wider">
+                    <i class="fas fa-sign-out-alt"></i> Terminate Session
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-8">
+            <header id="overview" class="flex justify-between items-center mb-10">
+                <div>
+                    <h1 class="text-3xl font-bold font-cyber uppercase tracking-tight">Control <span class="text-red-700">Center</span></h1>
+                    <p class="text-slate-400 text-sm"> Network Traffic Analysis</p>
+                </div>
+                <button onclick="window.location.reload()" class="bg-red-950/40 border border-red-900/50 px-5 py-2 rounded-xl text-xs font-bold hover:bg-red-900 transition uppercase tracking-widest">
+                    <i class="fas fa-sync-alt mr-2"></i> Sync Cloud
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                <div class="glass p-6 rounded-2xl border-b-2 border-slate-700">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Total Packets Flagged</p>
+                    <h2 id="stat-total-alerts" class="text-3xl font-black font-cyber">0</h2>
+                </div>
+                <div class="glass p-6 rounded-2xl border-b-2 border-yellow-500">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Suspicious Activity</p>
+                    <h2 id="stat-suspicious" class="text-3xl font-black font-cyber text-yellow-500">0</h2>
+                </div>
+                <div class="glass p-6 rounded-2xl border-b-2 border-red-600">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Critical Threats</p>
+                    <h2 id="stat-critical" class="text-3xl font-black font-cyber text-red-600">0</h2>
+                </div>
+                <div class="glass p-6 rounded-2xl border-b-2 border-green-600">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Sensor Health</p>
+                    <h2 class="text-xl font-bold font-cyber text-green-500">ACTIVE</h2>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8 mb-10">
+                <div class="glass p-6 rounded-2xl h-80">
+                    <h3 class="text-[10px] font-bold mb-4 uppercase text-slate-400 tracking-widest">Traffic Intensity (PPS)</h3>
+                    <div class="h-64 relative"><canvas id="trafficChart"></canvas></div>
+                </div>
+                <div class="glass p-6 rounded-2xl h-80">
+                    <h3 class="text-[10px] font-bold mb-4 uppercase text-slate-400 tracking-widest">Threat Distribution</h3>
+                    <div class="h-64 relative"><canvas id="threatChart"></canvas></div>
+                </div>
+            </div>
+
+            <section id="logs" class="glass rounded-2xl overflow-hidden mb-10">
+                <div class="p-6 border-b border-slate-800 bg-red-950/10 flex justify-between">
+                    <h3 class="font-bold font-cyber uppercase tracking-widest text-sm">Detailed Intrusion Logs</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-slate-500 uppercase text-[10px] border-b border-slate-800">
+                            <tr>
+                                <th class="p-4">Time</th>
+                                <th class="p-4">Source IP (Location)</th>
+                                <th class="p-4">Signature / Rule Matched</th>
+                                <th class="p-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alert-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="rules" class="glass rounded-2xl p-8 mb-10">
+                <h3 class="font-bold font-cyber uppercase tracking-widest text-sm mb-6">Active Detection Rules</h3>
+                <div class="grid gap-4">
+                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-800 text-xs font-mono text-slate-400">
+                        alert icmp any any -&gt; $HOME_NET any (msg:"[SCAN] ICMP Ping Detected"; itype:8; sid:1000001;)
+                    </div>
+                    <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-800 text-xs font-mono text-slate-400">
+                        alert tcp any any -&gt; $HOME_NET any (msg:"[CRITICAL] Nmap Stealth Scan"; flags:S; threshold:type both, track by_src, count 20, seconds 10; sid:1000002;)
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Alert Modal Details Dynamic Layer -->
+    <div id="alertModal" class="modal">
+        <div class="glass p-8 rounded-3xl max-w-md w-full border-t-4 border-red-700 shadow-2xl">
+            <h2 id="modalTitle" class="text-xl font-bold font-cyber mb-4 text-red-500 uppercase"></h2>
+            <div class="space-y-4 text-slate-300 text-sm">
+                <p id="modalDesc" class="italic border-l-2 border-red-900/50 pl-4 py-1 bg-red-900/5"></p>
+                <div class="grid grid-cols-2 gap-4 text-[10px] uppercase font-bold text-slate-500 pt-4">
+                    <div>Proto: <span id="modalProto" class="text-white"></span></div>
+                    <div>Target IP: <span id="modalDest" class="text-white"></span></div>
+                    <div>Geo Info: <span id="modalGeo" class="text-white"></span></div>
+                    <div>Category: <span id="modalCat" class="text-white"></span></div>
+                </div>
+            </div>
+            <button onclick="closeModal()" class="mt-8 w-full bg-slate-800 py-3 rounded-xl font-bold hover:bg-red-900 transition uppercase text-xs tracking-widest">Close Investigation</button>
+        </div>
+    </div>
+
+<script>
+    // --- 1. FIREBASE ARCHITECTURE INITIALIZATION ---
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCVS9na3K2hE9yyWWJulcBKHPXFkiMRExk",
+        authDomain: "nids-3f976.firebaseapp.com",
+        databaseURL: "https://nids-3f976-default-rtdb.firebaseio.com",
+        projectId: "nids-3f976",
+        storageBucket: "nids-3f976.firebasestorage.app",
+        messagingSenderId: "93442420156",
+        appId: "1:93442420156:web:3de538bb0b995dd8cbcfb9",
+        measurementId: "G-CK4TYK41E0"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const auth = firebase.auth();
+
+    // --- 2. AUTHENTICATION UI CONTROL INTERFACES ---
+    let isLoginMode = true;
+    const authOverlay = document.getElementById('auth-overlay');
+    const dashboardRoot = document.getElementById('dashboard-root');
+    const authForm = document.getElementById('auth-form');
+    const authTitle = document.getElementById('auth-title');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const toggleAuthModeBtn = document.getElementById('toggle-auth-mode');
+    const authError = document.getElementById('auth-error');
+    const authSuccess = document.getElementById('auth-success');
+    const passwordInput = document.getElementById('auth-password');
+    const togglePasswordVisibilityBtn = document.getElementById('toggle-password-visibility');
+    const passwordToggleIcon = document.getElementById('password-toggle-icon');
+
+    // Password Show/Hide Toggle
+    togglePasswordVisibilityBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        passwordToggleIcon.className = isPassword ? 'fas fa-eye-slash text-red-500' : 'fas fa-eye';
+    });
+
+    // Toggle between Login and Signup modes
+    toggleAuthModeBtn.addEventListener('click', () => {
+        isLoginMode = !isLoginMode;
+        if(isLoginMode) {
+            authTitle.innerText = "Secure Administrator Access";
+            authSubmitBtn.innerText = "Authorize Login";
+            toggleAuthModeBtn.innerText = "Need a monitoring account? Sign Up instead";
+        } else {
+            authTitle.innerText = "Register New Administrator";
+            authSubmitBtn.innerText = "Create Admin Profile";
+            toggleAuthModeBtn.innerText = "Already registered? Log In instead";
+        }
+        authError.classList.add('hidden');
+        authSuccess.classList.add('hidden');
+    });
+
+    // Handle Form Submissions with Promise-Chained Verification Logic
+    authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value;
+        const password = passwordInput.value;
+        authError.classList.add('hidden');
+        authSuccess.classList.add('hidden');
+
+        // Validation: 8 character minimum requirement
+        if (password.length < 8) {
+            displayAuthError("Password must be at least 8 characters long.");
+            return;
+        }
+
+        if (isLoginMode) {
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    if (!userCredential.user.emailVerified) {
+                        displayAuthError("Email verification required. Check your inbox and click the link to authorize access.");
+                        authSuccess.innerHTML = `Need a new link? <button onclick="resendVerification('${email}', '${password}')" class="underline font-bold hover:text-white">Click here to resend verification email</button>`;
+                        authSuccess.classList.remove('hidden');
+                        auth.signOut();
+                    }
+                })
+                .catch(err => displayAuthError(err.message));
+        } else {
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Send Email Verification and handle completion sequentially
+                    return userCredential.user.sendEmailVerification();
+                })
+                .then(() => {
+                    displayAuthSuccess("Account created! A verification email has been sent to " + email + ". Verify your inbox before signing in.");
+                    // Return view to Login mode
+                    isLoginMode = true;
+                    authTitle.innerText = "Secure Administrator Access";
+                    authSubmitBtn.innerText = "Authorize Login";
+                    toggleAuthModeBtn.innerText = "Need a monitoring account? Sign Up instead";
+                    return auth.signOut();
+                })
+                .catch(err => displayAuthError(err.message));
+        }
+    });
+
+    function resendVerification(email, password) {
+        auth.signInWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                return userCredential.user.sendEmailVerification();
+            })
+            .then(() => {
+                displayAuthSuccess("Verification email resent successfully. Please check your inbox.");
+                return auth.signOut();
+            })
+            .catch(err => displayAuthError(err.message));
+    }
+
+    function displayAuthError(msg) {
+        authError.innerText = msg;
+        authError.classList.remove('hidden');
+    }
+
+    function displayAuthSuccess(msg) {
+        authSuccess.innerText = msg;
+        authSuccess.classList.remove('hidden');
+    }
+
+    function handleSignOut() {
+        if(confirm("Terminate active monitoring administration session?")) {
+            auth.signOut();
+        }
+    }
+
+    // --- 3. LIFECYCLE MONITORING STATE WATCHER ---
+    auth.onAuthStateChanged((user) => {
+        if (user && user.emailVerified) {
+            // User Authorized & Email Verified -> Access Dashboard
+            authOverlay.style.display = 'none';
+            dashboardRoot.style.opacity = '1';
+            dashboardRoot.style.pointerEvents = 'auto';
+            initDatabaseStreams();
+        } else {
+            // Unauthenticated or Unverified -> Lock Dashboard View
+            authOverlay.style.display = 'flex';
+            dashboardRoot.style.opacity = '0';
+            dashboardRoot.style.pointerEvents = 'none';
+            detachDatabaseStreams();
+        }
+    });
+
+    // --- 4. DATA LOG INGESTION HOOKS ---
+    let alertRef = null;
+    let totalCount = 0, criticalCount = 0, suspiciousCount = 0;
+    const threatData = { 'Exploits/CVEs': 0, 'DoS/Flooding': 0, 'Web Attacks': 0, 'Brute Force': 0, 'Recon/Scans': 0, 'Anomalies': 0, 'Policy/Info': 0, 'Miscellaneous': 0 };
+
+    function initDatabaseStreams() {
+        if (alertRef) return; 
+
+        alertRef = database.ref('network_alerts');
+        
+        alertRef.limitToLast(150).on('child_added', (snapshot) => {
+            try {
+                const data = snapshot.val();
+                if (!data) return;
+
+                const id = snapshot.key;
+                const signatureRaw = data.signature || "Unknown Event";
+                const sig = signatureRaw.toLowerCase();
+                const srcIp = data.src_ip || "0.0.0.0";
+                const destIp = data.dest_ip || "0.0.0.0";
+                const proto = data.proto || "TCP";
+                const country = data.country || "Local";
+                const city = data.city || "Local";
+                const category = data.category || "General Threat";
+                
+                let formattedTime = new Date().toLocaleTimeString();
+                if(data.timestamp) {
+                    const parsedDate = new Date(data.timestamp);
+                    if(!isNaN(parsedDate)) formattedTime = parsedDate.toLocaleTimeString();
+                }
+                
+                totalCount++;
+                document.getElementById('stat-total-alerts').innerText = totalCount;
+                
+                if(parseInt(data.severity) === 1 || data.severity === "1") { 
+                    criticalCount++; 
+                } else { 
+                    suspiciousCount++; 
+                }
+                document.getElementById('stat-critical').innerText = criticalCount;
+                document.getElementById('stat-suspicious').innerText = suspiciousCount;
+
+                if (sig.includes("exploit") || sig.includes("blue") || sig.includes("shock") || sig.includes("cve")) threatData['Exploits/CVEs']++;
+                else if (sig.includes("flood") || sig.includes("dos") || sig.includes("syn") || sig.includes("attack")) threatData['DoS/Flooding']++;
+                else if (sig.includes("sql") || sig.includes("admin") || sig.includes("traversal") || sig.includes("php")) threatData['Web Attacks']++;
+                else if (sig.includes("brute") || sig.includes("login") || sig.includes("password")) threatData['Brute Force']++;
+                else if (sig.includes("scan") || sig.includes("nmap") || sig.includes("port") || sig.includes("ping") || sig.includes("icmp")) threatData['Recon/Scans']++;
+                else if (sig.includes("stream") || sig.includes("thread") || sig.includes("anomaly")) threatData['Anomalies']++;
+                else if (sig.includes("info") || sig.includes("spotify") || sig.includes("kali") || sig.includes("p2p") || sig.includes("dhcp")) threatData['Policy/Info']++;
+                else threatData['Miscellaneous']++;
+                
+                threatChart.data.datasets[0].data = Object.values(threatData);
+                threatChart.update();
+
+                trafficChart.data.labels.push(formattedTime);
+                trafficChart.data.datasets[0].data.push(totalCount);
+                if(trafficChart.data.labels.length > 10) { 
+                    trafficChart.data.labels.shift(); 
+                    trafficChart.data.datasets[0].data.shift(); 
+                }
+                trafficChart.update();
+
+                const safeSig = encodeURIComponent(signatureRaw);
+                const safeDest = encodeURIComponent(destIp);
+                const safeProto = encodeURIComponent(proto);
+                const safeCountry = encodeURIComponent(country);
+                const safeCity = encodeURIComponent(city);
+                const safeCategory = encodeURIComponent(category);
+
+                const row = `
+                    <tr id="row-${id}" class="alert-row border-b border-slate-800 hover:bg-white/5 transition">
+                        <td class="p-4 text-xs font-mono text-slate-500">${formattedTime}</td>
+                        <td class="p-4 font-bold text-red-500/80 text-xs">${srcIp} <span class="text-[10px] text-slate-500 font-normal">(${country})</span></td>
+                        <td class="p-4 text-xs text-slate-300 font-medium">${signatureRaw}</td>
+                        <td class="p-4 flex gap-4">
+                            <button onclick="showDetailsDecoded('${safeSig}', '${safeDest}', '${safeProto}', '${safeCountry}', '${safeCity}', '${safeCategory}')" class="text-blue-400 hover:text-white transition"><i class="fas fa-eye"></i></button>
+                            <button onclick="deleteFromCloud('${id}')" class="text-red-900 hover:text-red-500 transition"><i class="fas fa-check-circle"></i></button>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('alert-table-body').insertAdjacentHTML('afterbegin', row);
+            } catch (error) {
+                console.error("Payload processing error:", error);
+            }
+        });
+
+        database.ref('network_alerts').on('child_removed', (snapshot) => {
+            const removedRow = document.getElementById(`row-${snapshot.key}`);
+            if (removedRow) {
+                removedRow.style.opacity = '0';
+                setTimeout(() => removedRow.remove(), 300); 
+            }
+        });
+    }
+
+    function detachDatabaseStreams() {
+        if (alertRef) {
+            alertRef.off();
+            database.ref('network_alerts').off();
+            alertRef = null;
+        }
+        document.getElementById('alert-table-body').innerHTML = "";
+    }
+
+    function deleteFromCloud(alertId) {
+        if(confirm("Mark as resolved? This removes it from the Cloud Database.")) {
+            database.ref('network_alerts/' + alertId).remove();
+        }
+    }
+
+    // --- 5. INITIAL STATIC ANALYTIC PLOTS ---
+    const trafficChart = new Chart(document.getElementById('trafficChart'), {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Alerts', data: [], borderColor: '#800020', tension: 0.4, fill: true, backgroundColor: 'rgba(128,0,32,0.1)' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#1e293b' } }, x: { grid: { display: false } } } }
+    });
+
+    const threatChart = new Chart(document.getElementById('threatChart'), {
+        type: 'doughnut',
+        data: { 
+            labels: Object.keys(threatData), 
+            datasets: [{ 
+                data: Object.values(threatData), 
+                backgroundColor: ['#7c3aed', '#b91c1c', '#ea580c', '#eab308', '#2563eb', '#0891b2', '#16a34a', '#475569'], 
+                borderWidth: 0 
+            }] 
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11, weight: 'bold' } } } } }
+    });
+
+    function interpret(sig) {
+        if(!sig) return "General Threat Alert Match.";
+        const s = sig.toLowerCase();
+        if(s.includes("eternalblue")) return "Exploit: Windows SMB Vulnerability (MS17-010).";
+        if(s.includes("shellshock")) return "Exploit: Remote Bash Command Execution.";
+        if(s.includes("sql") || s.includes("traversal")) return "Web Attack: Injection or Directory Access Attempt.";
+        if(s.includes("admin") || s.includes("panel")) return "Discovery: Searching for admin backend endpoint.";
+        if(s.includes("scan") || s.includes("nmap")) return "Recon: Network Mapping / Asset Profiling.";
+        if(s.includes("flood") || s.includes("dos") || s.includes("ddos")) return "DoS: Resource exhaustion flood attack.";
+        if(s.includes("brute") || s.includes("login") || s.includes("password")) return "Access: Repeated brute force authentication attempts.";
+        if(s.includes("stream") || s.includes("thread") || s.includes("anomaly")) return "Protocol Anomaly: Non-standard TCP/IP packet behavior.";
+        return "Signature Match: Core rules engine custom alert triggered.";
+    }
+
+    function showDetailsDecoded(eSig, eDest, eProto, eCountry, eCity, eCategory) {
+        const sig = decodeURIComponent(eSig);
+        const dest = decodeURIComponent(eDest);
+        const proto = decodeURIComponent(eProto);
+        const country = decodeURIComponent(eCountry);
+        const city = decodeURIComponent(eCity);
+        const category = decodeURIComponent(eCategory);
+
+        document.getElementById('modalTitle').innerText = sig || "Unknown Threat";
+        document.getElementById('modalDesc').innerText = interpret(sig);
+        document.getElementById('modalDest').innerText = dest || "0.0.0.0";
+        document.getElementById('modalProto').innerText = proto || "Unknown";
+        document.getElementById('modalGeo').innerText = `${city || 'Unknown'}, ${country || 'Unknown'}`;
+        document.getElementById('modalCat').innerText = category || "N/A";
+        document.getElementById('alertModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('alertModal').style.display = 'none'; }
+</script>
+</body>
+</html>
