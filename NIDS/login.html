@@ -113,6 +113,55 @@
                 </button>
             </header>
 
+            <!-- ================= AGENT DEPLOYMENT & INSTALLATION INSTRUCTIONS ================= -->
+            <section class="glass p-6 rounded-2xl mb-10 border-l-4 border-red-700">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fas fa-terminal text-red-500 text-xl"></i>
+                    <h3 class="font-bold font-cyber uppercase tracking-widest text-sm">Deploy NIDS Agent (Instant Connection)</h3>
+                </div>
+                <p class="text-xs text-slate-400 mb-6">
+                    Select your operating system below, copy the command, and paste it directly into your terminal or PowerShell to install and connect your sensor instantly.
+                </p>
+
+                <!-- OS Tabs / Switcher -->
+                <div class="flex gap-2 mb-4 border-b border-slate-800 pb-3">
+                    <button onclick="switchOsTab('linux')" id="tab-linux" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-red-950 text-white border border-red-900 transition">Linux</button>
+                    <button onclick="switchOsTab('windows')" id="tab-windows" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-slate-900 text-slate-400 hover:text-white transition">Windows</button>
+                    <button onclick="switchOsTab('macos')" id="tab-macos" class="px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-slate-900 text-slate-400 hover:text-white transition">macOS</button>
+                </div>
+
+                <!-- Command Display Panels -->
+                <div id="panel-linux" class="os-panel space-y-3">
+                    <div class="flex justify-between items-center text-[10px] uppercase font-bold text-slate-500">
+                        <span>Run in Linux Terminal (Bash)</span>
+                        <button onclick="copyCommand('cmd-linux')" class="text-red-400 hover:text-white transition"><i class="fas fa-copy mr-1"></i> Copy Command</button>
+                    </div>
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-red-400 overflow-x-auto select-all" id="cmd-linux">
+                        curl -L -o nids_agent.tar.gz https://github.com/TestiJJ/NIDS/releases/download/v1.0.0/nids_agent_linux.tar.gz && tar -xzvf nids_agent.tar.gz && sudo ./install.sh
+                    </div>
+                </div>
+
+                <div id="panel-windows" class="os-panel space-y-3 hidden">
+                    <div class="flex justify-between items-center text-[10px] uppercase font-bold text-slate-500">
+                        <span>Run in Windows PowerShell</span>
+                        <button onclick="copyCommand('cmd-windows')" class="text-red-400 hover:text-white transition"><i class="fas fa-copy mr-1"></i> Copy Command</button>
+                    </div>
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-red-400 overflow-x-auto select-all" id="cmd-windows">
+                        Invoke-WebRequest -Uri "https://github.com/TestiJJ/NIDS/releases/download/v1.0.0/nids_agent_windows.zip" -OutFile "nids_agent.zip"; Expand-Archive nids_agent.zip -DestinationPath .\nids_agent_extracted; cd .\nids_agent_extracted; .\nids_bridge.exe
+                    </div>
+                </div>
+
+                <div id="panel-macos" class="os-panel space-y-3 hidden">
+                    <div class="flex justify-between items-center text-[10px] uppercase font-bold text-slate-500">
+                        <span>Run in macOS Terminal</span>
+                        <button onclick="copyCommand('cmd-macos')" class="text-red-400 hover:text-white transition"><i class="fas fa-copy mr-1"></i> Copy Command</button>
+                    </div>
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 font-mono text-xs text-red-400 overflow-x-auto select-all" id="cmd-macos">
+                        curl -L -o nids_agent.tar.gz https://github.com/TestiJJ/NIDS/releases/download/v1.0.0/nids_agent_macos.tar.gz && tar -xzvf nids_agent.tar.gz && ./install.sh
+                    </div>
+                </div>
+            </section>
+
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                 <div class="glass p-6 rounded-2xl border-b-2 border-slate-700">
                     <p class="text-slate-500 text-[10px] font-bold uppercase mb-2">Total Packets Flagged</p>
@@ -336,7 +385,29 @@
         }
     });
 
-    // --- 4. DATA LOG INGESTION HOOKS ---
+    // --- 4. OS SWITCHER & CLIPBOARD FUNCTIONS ---
+    function switchOsTab(os) {
+        document.querySelectorAll('.os-panel').forEach(panel => panel.classList.add('hidden'));
+        ['linux', 'windows', 'macos'].forEach(item => {
+            const btn = document.getElementById(`tab-${item}`);
+            btn.className = "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-slate-900 text-slate-400 hover:text-white transition";
+        });
+
+        document.getElementById(`panel-${os}`).classList.remove('hidden');
+        const activeBtn = document.getElementById(`tab-${os}`);
+        activeBtn.className = "px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-red-950 text-white border border-red-900 transition";
+    }
+
+    function copyCommand(elementId) {
+        const text = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Deployment command copied to clipboard!");
+        }).catch(err => {
+            console.error("Failed to copy text: ", err);
+        });
+    }
+
+    // --- 5. DATA LOG INGESTION HOOKS ---
     let alertRef = null;
     let totalCount = 0, criticalCount = 0, suspiciousCount = 0;
     const threatData = { 'Exploits/CVEs': 0, 'DoS/Flooding': 0, 'Web Attacks': 0, 'Brute Force': 0, 'Recon/Scans': 0, 'Anomalies': 0, 'Policy/Info': 0, 'Miscellaneous': 0 };
@@ -446,7 +517,7 @@
         }
     }
 
-    // --- 5. INITIAL STATIC ANALYTIC PLOTS ---
+    // --- 6. INITIAL STATIC ANALYTIC PLOTS ---
     const trafficChart = new Chart(document.getElementById('trafficChart'), {
         type: 'line',
         data: { labels: [], datasets: [{ label: 'Alerts', data: [], borderColor: '#800020', tension: 0.4, fill: true, backgroundColor: 'rgba(128,0,32,0.1)' }] },
