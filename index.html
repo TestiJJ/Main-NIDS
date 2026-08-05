@@ -95,7 +95,7 @@
     <div id="dashboard-root" class="w-full flex flex-col md:flex-row min-h-screen opacity-0 transition-opacity duration-500 pointer-events-none">
         
         <!-- Sidebar Navigation (Desktop & Mobile Drawer) -->
-        <aside id="sidebar-drawer" class="w-full md:w-64 glass border-r border-red-900/30 hidden md:flex flex-col p-6 fixed md:sticky top-0 h-screen z-50 bg-slate-950/95 md:bg-transparent overflow-y-auto">
+        <aside id="sidebar-drawer" class="w-full md:w-64 glass border-r border-red-900/30 hidden md:flex flex-col p-6 fixed md:sticky top-0 h-screen z-50 bg-slate-950/95 md:bg-transparent">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-2">
                     <i class="fas fa-shield-virus text-red-700 text-2xl"></i>
@@ -131,15 +131,12 @@
                 <a href="#rules" onclick="toggleMobileMenu()" class="flex items-center gap-3 p-3 text-slate-400 hover:text-white transition">
                     <i class="fas fa-cog"></i> Custom Rules
                 </a>
-                <a href="#downloads" onclick="toggleMobileMenu()" class="flex items-center gap-3 p-3 text-slate-400 hover:text-white transition">
-                    <i class="fas fa-download"></i> Sensor Downloads
-                </a>
                 <button onclick="openSettingsModal(); toggleMobileMenu()" class="w-full flex items-center gap-3 p-3 text-slate-400 hover:text-white transition text-left">
                     <i class="fas fa-user-cog"></i> Account Settings
                 </button>
             </nav>
 
-            <div class="pt-6 border-t border-slate-800 flex flex-col gap-4 mt-4">
+            <div class="pt-6 border-t border-slate-800 flex flex-col gap-4">
                 <div class="text-[10px] text-slate-500 uppercase tracking-widest">
                     Sensor Status: <span class="text-green-500 animate-pulse">● Online</span>
                 </div>
@@ -155,14 +152,11 @@
                     <h1 class="text-2xl md:text-3xl font-bold font-cyber uppercase tracking-tight">Control <span class="text-red-700">Center</span></h1>
                     <p class="text-slate-400 text-xs md:text-sm"> Welcome back, <span id="header-user-welcome" class="text-red-400 font-semibold">Admin</span></p>
                 </div>
-                <div class="flex items-center gap-2 md:gap-3 w-full sm:w-auto flex-wrap">
-                    <a href="#downloads" class="bg-red-950/60 border border-red-900/60 px-3 py-2 rounded-xl text-xs font-bold hover:bg-red-900 transition uppercase tracking-widest text-white flex items-center">
-                        <i class="fas fa-download mr-1 md:mr-2"></i> Get Agent
-                    </a>
-                    <button onclick="openSettingsModal()" class="bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition uppercase tracking-widest text-slate-300">
+                <div class="flex items-center gap-2 md:gap-3 w-full sm:w-auto">
+                    <button onclick="openSettingsModal()" class="flex-1 sm:flex-none bg-slate-900 border border-slate-800 px-3 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition uppercase tracking-widest text-slate-300">
                         <i class="fas fa-user-shield mr-1 md:mr-2"></i> Settings
                     </button>
-                    <button onclick="window.location.reload()" class="bg-red-950/40 border border-red-900/50 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-900 transition uppercase tracking-widest text-white">
+                    <button onclick="window.location.reload()" class="flex-1 sm:flex-none bg-red-950/40 border border-red-900/50 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-900 transition uppercase tracking-widest">
                         <i class="fas fa-sync-alt mr-1 md:mr-2"></i> Sync
                     </button>
                 </div>
@@ -236,6 +230,71 @@
                 </div>
             </section>
 
+                                <!-- OS Download Center Section -->
+            <section id="downloads" class="glass rounded-2xl p-4 md:p-8 mb-10">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="font-bold font-cyber uppercase tracking-widest text-xs md:text-sm">Sensor Executable Downloads</h3>
+                        <p class="text-slate-400 text-xs">Download and deploy the pre-compiled NIDS Python bridge executable for your target operating system.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Windows Build Card -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-red-800 transition">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-blue-950/60 border border-blue-900/50 flex items-center justify-center text-blue-400 text-lg">
+                                    <i class="fab fa-windows"></i>
+                                </div>
+                                <span class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-full text-slate-300 font-bold uppercase">x64 Binary</span>
+                            </div>
+                            <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">Windows Agent</h4>
+                            <p class="text-slate-400 text-xs mb-6">Compiled standalone executable for Windows Server and Workstation environments. Requires Npcap driver.</p>
+                        </div>
+                        <a href="https://github.com/Testijj/Main-NIDS/releases/latest/download/nids_agent_windows.zip" class="w-full bg-blue-950/40 border border-blue-900/50 hover:bg-blue-900 text-blue-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition block">
+                            <i class="fas fa-download mr-1.5"></i> Download (.zip)
+                        </a>
+                    </div>
+
+                    <!-- Linux / Kali Build Card -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-red-800 transition">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-orange-950/60 border border-orange-900/50 flex items-center justify-center text-orange-400 text-lg">
+                                    <i class="fab fa-linux"></i>
+                                </div>
+                                <span class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-full text-slate-300 font-bold uppercase">ELF Binary</span>
+                            </div>
+                            <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">Linux / Kali Agent</h4>
+                            <p class="text-slate-400 text-xs mb-6">Native ELF binary optimized for Ubuntu, Debian, and Kali Linux security auditing nodes with libpcap.</p>
+                        </div>
+                        <a href="https://github.com/Testijj/Main-NIDS/releases/latest/download/nids_agent_linux.tar.gz" class="w-full bg-orange-950/40 border border-orange-900/50 hover:bg-orange-900 text-orange-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition block">
+                            <i class="fas fa-download mr-1.5"></i> Download (.tar.gz)
+                        </a>
+                    </div>
+
+                    <!-- macOS Build Card -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-red-800 transition">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 text-lg">
+                                    <i class="fab fa-apple"></i>
+                                </div>
+                                <span class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-full text-slate-300 font-bold uppercase">Universal</span>
+                            </div>
+                            <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">macOS Agent</h4>
+                            <p class="text-slate-400 text-xs mb-6">Mach-O binary package tailored for Apple Silicon (M1/M2/M3) and Intel macOS surveillance instances.</p>
+                        </div>
+                        <a href="https://github.com/Testijj/Main-NIDS/releases/latest/download/nids_agent_macos.tar.gz" class="w-full bg-slate-800/80 border border-slate-700 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition block">
+                            <i class="fas fa-download mr-1.5"></i> Download (.tar.gz)
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+
+
             <!-- Custom Rules & Watchlists Section -->
             <section id="rules" class="glass rounded-2xl p-4 md:p-8 mb-10">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -265,72 +324,6 @@
                     </div>
                 </div>
             </section>
-
-            <!-- ================= NEW: SENSOR DOWNLOAD CENTER ================= -->
-            <section id="downloads" class="glass rounded-2xl p-4 md:p-8 mb-10 border-t-2 border-red-700">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                    <div>
-                        <h3 class="font-bold font-cyber uppercase tracking-widest text-xs md:text-sm text-white">
-                            <i class="fas fa-download text-red-600 mr-2"></i> NIDS Agent Download & Setup Center
-                        </h3>
-                        <p class="text-slate-400 text-xs mt-1">Download pre-compiled bridge packages or installers for your infrastructure nodes.</p>
-                    </div>
-                    <span class="text-[10px] bg-red-950/60 border border-red-900/50 text-red-400 px-3 py-1 rounded-full font-bold uppercase tracking-widest">
-                        Release v1.0.0 Stable
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <!-- Windows Agent Package -->
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fab fa-windows text-blue-400 text-lg"></i>
-                                <span class="font-bold text-sm text-white font-cyber">Windows Agent</span>
-                            </div>
-                            <p class="text-slate-400 text-xs mb-4">Standalone executable & PowerShell wrapper for Windows infrastructure monitoring.</p>
-                        </div>
-                        <a href="https://github.com/TestiJJ/NIDS/releases/download/v1.0.0/nids_agent_windows.zip" class="w-full bg-red-950/60 hover:bg-red-900 text-white font-bold text-xs py-2.5 px-4 rounded-lg uppercase tracking-wider text-center transition border border-red-900/50 block">
-                            <i class="fas fa-download mr-1"></i> Download .zip
-                        </a>
-                    </div>
-
-                    <!-- Linux Agent Package -->
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fab fa-linux text-yellow-400 text-lg"></i>
-                                <span class="font-bold text-sm text-white font-cyber">Linux / Kali Agent</span>
-                            </div>
-                            <p class="text-slate-400 text-xs mb-4">Optimized Python Suricata bridge script and archive for Debian/Kali environments.</p>
-                        </div>
-                        <a href="https://github.com/TestiJJ/NIDS/releases/download/v1.0.0/nids_agent_linux.tar.gz" class="w-full bg-red-950/60 hover:bg-red-900 text-white font-bold text-xs py-2.5 px-4 rounded-lg uppercase tracking-wider text-center transition border border-red-900/50 block">
-                            <i class="fas fa-download mr-1"></i> Download .tar.gz
-                        </a>
-                    </div>
-
-                    <!-- macOS Agent Package -->
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fab fa-apple text-slate-200 text-lg"></i>
-                                <span class="font-bold text-sm text-white font-cyber">macOS Agent</span>
-                            </div>
-                            <p class="text-slate-400 text-xs mb-4">Universal build asset for macOS Unix network surveillance nodes.</p>
-                        </div>
-                        <a href="https://github.com/TestiJJ/NIDS/releases/download/v1.0.0/nids_agent_macos.tar.gz" class="w-full bg-red-950/60 hover:bg-red-900 text-white font-bold text-xs py-2.5 px-4 rounded-lg uppercase tracking-wider text-center transition border border-red-900/50 block">
-                            <i class="fas fa-download mr-1"></i> Download Build
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Quick Setup Instructions Box -->
-                <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300">
-                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 font-sans">Quick Configuration Guide</div>
-                    <p class="text-slate-400 mb-2 font-sans">Remember to copy your unique <span class="text-red-400 font-semibold">Sensor Owner UID</span> from the sidebar and insert it into your sensor deployment configuration (`SENSOR_USER_ID`) to link telemetry directly to your account.</p>
-                    <code class="block bg-slate-900 p-2 rounded text-red-300 select-all">git clone https://github.com/TestiJJ/NIDS.git && cd NIDS</code>
-                </div>
-            </section>
         </main>
     </div>
 
@@ -347,7 +340,7 @@
                     <div>Category: <span id="modalCat" class="text-white"></span></div>
                 </div>
             </div>
-            <button onclick="closeModal()" class="mt-8 w-full bg-slate-800 py-3 rounded-xl font-bold hover:bg-red-900 transition uppercase text-xs tracking-widest text-white">Close Investigation</button>
+            <button onclick="closeModal()" class="mt-8 w-full bg-slate-800 py-3 rounded-xl font-bold hover:bg-red-900 transition uppercase text-xs tracking-widest">Close Investigation</button>
         </div>
     </div>
 
@@ -358,8 +351,13 @@
                 <h2 class="text-lg md:text-xl font-bold font-cyber text-white uppercase"><i class="fas fa-user-cog text-red-600 mr-2"></i> Account Settings</h2>
                 <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
+            
 
             <div id="settings-status" class="hidden text-xs p-3 rounded-xl mb-4 font-medium text-center"></div>
+            <button onclick="openSettingsModal(); toggleMobileMenu()" class="w-full flex items-center gap-3 p-3 text-slate-400 hover:text-white transition text-left">
+    <i class="fas fa-user-cog"></i> Account Settings
+</button>
+
 
             <!-- Appearance Mode Settings -->
             <div class="mb-6 pb-6 border-b border-slate-800">
@@ -440,6 +438,7 @@
         localStorage.setItem('nids_theme', mode);
     }
 
+    // Restore saved theme preference
     const savedTheme = localStorage.getItem('nids_theme');
     if (savedTheme) setTheme(savedTheme);
 
@@ -604,6 +603,7 @@
                     statusDiv.className = "text-xs p-3 rounded-xl mb-4 font-medium text-center bg-emerald-950/40 border border-emerald-800 text-emerald-400";
                     statusDiv.innerText = "Password updated successfully!";
                     statusDiv.classList.remove('hidden');
+                    setTimeout(() => closeSettingsModal(), 1500);
                 })
                 .catch(err => {
                     statusDiv.className = "text-xs p-3 rounded-xl mb-4 font-medium text-center bg-red-950/40 border border-red-900 text-red-400";
@@ -613,183 +613,239 @@
         }
     });
 
-    // --- 5. REALTIME DASHBOARD & FIREBASE STREAM HANDLERS ---
-    let alertsRef = null;
-    let rulesRef = null;
-    let trafficChartInstance = null;
-    let threatChartInstance = null;
-
-    function initCharts() {
-        const trafficCtx = document.getElementById('trafficChart').getContext('2d');
-        trafficChartInstance = new Chart(trafficCtx, {
-            type: 'line',
-            data: {
-                labels: ['10s ago', '8s ago', '6s ago', '4s ago', '2s ago', 'Now'],
-                datasets: [{
-                    label: 'Packets / Sec',
-                    data: [0, 0, 0, 0, 0, 0],
-                    borderColor: '#b3002d',
-                    backgroundColor: 'rgba(179, 0, 45, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
-        });
-
-        const threatCtx = document.getElementById('threatChart').getContext('2d');
-        threatChartInstance = new Chart(threatCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Critical (Sev 1)', 'Suspicious (Sev 2)', 'Informational'],
-                datasets: [{
-                    data: [0, 0, 0],
-                    backgroundColor: ['#dc2626', '#eab308', '#3b82f6'],
-                    borderWidth: 0
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
-        });
-    }
-
-    initCharts();
-
-    function initDatabaseStreams(uid) {
-        const tbody = document.getElementById('alert-table-body');
-        alertsRef = database.ref('nids_alerts/' + uid);
-        
-        alertsRef.on('value', (snapshot) => {
-            tbody.innerHTML = '';
-            let total = 0, suspicious = 0, critical = 0;
-            let ppsSpike = 0;
-
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                Object.keys(data).forEach(key => {
-                    const alert = data[key];
-                    total++;
-                    if(alert.severity == 1) critical++;
-                    else if(alert.severity == 2) suspicious++;
-                    else suspicious++;
-                    ppsSpike += 5;
-
-                    const row = document.createElement('tr');
-                    row.className = "border-b border-slate-800/60 hover:bg-slate-900/40 transition alert-row";
-                    
-                    const timeStr = alert.timestamp ? new Date(alert.timestamp).toLocaleTimeString() : 'Just now';
-                    
-                    row.innerHTML = `
-                        <td class="p-3 md:p-4 text-slate-400 font-mono text-xs">${timeStr}</td>
-                        <td class="p-3 md:p-4 font-mono text-xs text-red-400 font-semibold">${alert.src_ip || 'Unknown'}</td>
-                        <td class="p-3 md:p-4 font-medium text-slate-200">${alert.signature || 'Custom Rule Matched'}</td>
-                        <td class="p-3 md:p-4">
-                            <button onclick="openModal('${alert.signature || 'Threat'}', '${alert.description || 'NIDS rule violation detected.'}', '${alert.proto || 'TCP'}', '${alert.dest_ip || 'Localhost'}', '${alert.geo || 'Internal Network'}', 'Severity ${alert.severity || 2}')" class="bg-red-950/40 border border-red-900/50 hover:bg-red-900 text-red-300 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">
-                                Inspect
-                            </button>
-                        </td>
-                        <td class="p-3 md:p-4 text-right">
-                            <button onclick="deleteAlert('${key}')" class="text-slate-500 hover:text-red-500 transition p-1">
-                                <i class="fas fa-trash-alt text-xs"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.prepend(row);
-                });
-            } else {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 italic text-xs">No intrusion events recorded yet. Sensor is standing by.</td></tr>`;
-            }
-
-            // Update Statistics DOM
-            document.getElementById('stat-total-alerts').innerText = total;
-            document.getElementById('stat-suspicious').innerText = suspicious;
-            document.getElementById('stat-critical').innerText = critical;
-
-            // Update Chart telemetry
-            if(trafficChartInstance) {
-                trafficChartInstance.data.datasets[0].data.shift();
-                trafficChartInstance.data.datasets[0].data.push(Math.min(100, Math.floor(Math.random() * 15) + (total > 0 ? 5 : 0)));
-                trafficChartInstance.update();
-            }
-
-            if(threatChartInstance) {
-                threatChartInstance.data.datasets[0].data = [critical, suspicious, Math.max(0, total - (critical + suspicious))];
-                threatChartInstance.update();
-            }
-        });
-    }
-
-    function detachDatabaseStreams() {
-        if(alertsRef) alertsRef.off();
-        if(rulesRef) rulesRef.off();
-    }
-
-    function deleteAlert(key) {
-        if (currentUserId && confirm("Delete this intrusion log entry?")) {
-            database.ref('nids_alerts/' + currentUserId + '/' + key).remove();
-        }
+    // --- 5. LOG DELETION LOGIC ---
+    function deleteAlert(alertId, element) {
+        if (!currentUserId || !alertId) return;
+        database.ref(`users/${currentUserId}/network_alerts/${alertId}`).remove()
+            .then(() => {
+                const row = element.closest('tr');
+                if (row) row.remove();
+            })
+            .catch(err => alert("Failed to delete log entry: " + err.message));
     }
 
     function clearAllLogs() {
-        if (currentUserId && confirm("Clear all stored intrusion logs for this sensor?")) {
-            database.ref('nids_alerts/' + currentUserId).remove();
+        if (!currentUserId) return;
+        if (confirm("Are you sure you want to clear ALL network intrusion logs?")) {
+            database.ref(`users/${currentUserId}/network_alerts`).remove()
+                .then(() => resetStats())
+                .catch(err => alert("Failed to clear logs: " + err.message));
         }
     }
 
-    // --- 6. CUSTOM RULES MANAGEMENT ---
-    const addRuleForm = document.getElementById('add-rule-form');
-    const rulesList = document.getElementById('rules-list');
+    // --- 6. CUSTOM RULES MANAGER ---
+    let rulesRef = null;
 
-    addRuleForm.addEventListener('submit', (e) => {
+    function initRulesStream(uid) {
+        rulesRef = database.ref(`users/${uid}/custom_rules`);
+        rulesRef.on('value', (snapshot) => {
+            const rulesListContainer = document.getElementById('rules-list');
+            // Retain system default rule
+            rulesListContainer.innerHTML = `
+                <div class="p-4 bg-slate-900/50 rounded-lg border border-slate-800 text-xs font-mono text-slate-400 flex justify-between items-center">
+                    <span>alert icmp any any -&gt; $HOME_NET any (msg:"[SCAN] ICMP Ping Detected"; itype:8; sid:1000001;)</span>
+                    <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">SYSTEM DEFAULT</span>
+                </div>
+            `;
+
+            const rules = snapshot.val();
+            if (rules) {
+                Object.keys(rules).forEach(ruleId => {
+                    const rule = rules[ruleId];
+                    const div = document.createElement('div');
+                    div.className = "p-4 bg-slate-900/50 rounded-lg border border-slate-800 text-xs font-mono text-slate-300 flex justify-between items-center flex-wrap gap-2";
+                    div.innerHTML = `
+                        <div>
+                            <span class="font-bold text-red-400">[${rule.name}]</span> Keyword: <code class="bg-slate-950 px-2 py-0.5 rounded text-yellow-400">${rule.keyword}</code> (Severity: ${rule.severity == 1 ? 'Critical' : 'Alert'})
+                        </div>
+                        <button onclick="deleteRule('${ruleId}')" class="text-xs text-red-500 hover:text-red-400 font-bold uppercase"><i class="fas fa-trash"></i> Remove</button>
+                    `;
+                    rulesListContainer.appendChild(div);
+                });
+            }
+        });
+    }
+
+    document.getElementById('add-rule-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        if(!currentUserId) return;
+        if (!currentUserId) return;
 
         const name = document.getElementById('rule-name').value;
         const keyword = document.getElementById('rule-keyword').value;
         const severity = document.getElementById('rule-severity').value;
 
-        const newRuleRef = database.ref('nids_rules/' + currentUserId).push();
-        newRuleRef.set({
+        database.ref(`users/${currentUserId}/custom_rules`).push({
             name: name,
             keyword: keyword,
             severity: severity,
-            timestamp: Date.now()
+            timestamp: firebase.database.ServerValue.TIMESTAMP
         }).then(() => {
-            addRuleForm.reset();
-            alert("Custom detection rule successfully deployed to sensor workspace!");
-        }).catch(err => alert("Error saving rule: " + err.message));
+            document.getElementById('rule-name').value = "";
+            document.getElementById('rule-keyword').value = "";
+        });
     });
 
-    function initRulesStream(uid) {
-        rulesRef = database.ref('nids_rules/' + uid);
-        rulesRef.on('value', (snapshot) => {
-            // Keep default system rule
-            let html = `<div class="p-4 bg-slate-900/50 rounded-lg border border-slate-800 text-xs font-mono text-slate-400 flex justify-between items-center">
-                <span>alert icmp any any -&gt; $HOME_NET any (msg:"[SCAN] ICMP Ping Detected"; itype:8; sid:1000001;)</span>
-                <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-300">SYSTEM DEFAULT</span>
-            </div>`;
-
-            if(snapshot.exists()) {
-                const data = snapshot.val();
-                Object.keys(data).forEach(key => {
-                    const rule = data[key];
-                    html += `<div class="p-4 bg-slate-900/80 rounded-lg border border-red-900/30 text-xs font-mono text-slate-300 flex justify-between items-center">
-                        <div>
-                            <span class="text-red-400 font-bold">[CUSTOM]</span> 
-                            <span>${rule.name} (Keyword: <strong class="text-white">${rule.keyword}</strong>)</span>
-                        </div>
-                        <button onclick="deleteRule('${key}')" class="text-slate-500 hover:text-red-500 transition"><i class="fas fa-trash-alt"></i></button>
-                    </div>`;
-                });
-            }
-            rulesList.innerHTML = html;
-        });
+    function deleteRule(ruleId) {
+        if (!currentUserId) return;
+        database.ref(`users/${currentUserId}/custom_rules/${ruleId}`).remove();
     }
 
-    function deleteRule(key) {
-        if(currentUserId && confirm("Remove this custom detection rule?")) {
-            database.ref('nids_rules/' + currentUserId + '/' + key).remove();
+    // --- 7. CHARTS & REALTIME INGESTION STREAM ---
+    let alertRef = null;
+    let totalCount = 0, criticalCount = 0, suspiciousCount = 0;
+    let threatData = { 'Exploits/CVEs': 0, 'DoS/Flooding': 0, 'Web Attacks': 0, 'Brute Force': 0, 'Recon/Scans': 0, 'Anomalies': 0, 'Policy/Info': 0, 'Miscellaneous': 0 };
+
+    const trafficChart = new Chart(document.getElementById('trafficChart'), {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Alerts', data: [], borderColor: '#800020', tension: 0.4, fill: true, backgroundColor: 'rgba(128,0,32,0.1)' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#1e293b' } }, x: { grid: { display: false } } } }
+    });
+
+    const threatChart = new Chart(document.getElementById('threatChart'), {
+        type: 'doughnut',
+        data: { 
+            labels: Object.keys(threatData), 
+            datasets: [{ 
+                data: Object.values(threatData), 
+                backgroundColor: ['#7c3aed', '#b91c1c', '#ea580c', '#eab308', '#2563eb', '#0891b2', '#16a34a', '#475569'], 
+                borderWidth: 0 
+            }] 
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } } } } }
+    });
+
+    function resetStats() {
+        totalCount = 0;
+        criticalCount = 0;
+        suspiciousCount = 0;
+        threatData = { 'Exploits/CVEs': 0, 'DoS/Flooding': 0, 'Web Attacks': 0, 'Brute Force': 0, 'Recon/Scans': 0, 'Anomalies': 0, 'Policy/Info': 0, 'Miscellaneous': 0 };
+        document.getElementById('stat-total-alerts').innerText = "0";
+        document.getElementById('stat-critical').innerText = "0";
+        document.getElementById('stat-suspicious').innerText = "0";
+        document.getElementById('alert-table-body').innerHTML = "";
+        
+        trafficChart.data.labels = [];
+        trafficChart.data.datasets[0].data = [];
+        trafficChart.update();
+
+        threatChart.data.datasets[0].data = Object.values(threatData);
+        threatChart.update();
+    }
+
+    function detachDatabaseStreams() {
+        if (alertRef) {
+            alertRef.off();
+            alertRef = null;
         }
+        if (rulesRef) {
+            rulesRef.off();
+            rulesRef = null;
+        }
+    }
+
+    function initDatabaseStreams(uid) {
+        if (alertRef) detachDatabaseStreams();
+        resetStats();
+
+        alertRef = database.ref(`users/${uid}/network_alerts`);
+        
+        alertRef.limitToLast(150).on('child_added', (snapshot) => {
+            try {
+                const data = snapshot.val();
+                if (!data) return;
+
+                const alertId = snapshot.key;
+                const signatureRaw = data.signature || "Unknown Event";
+                const sig = signatureRaw.toLowerCase();
+                const srcIp = data.src_ip || "0.0.0.0";
+                const destIp = data.dest_ip || "0.0.0.0";
+                const proto = data.proto || "TCP";
+                const country = data.country || "Local";
+                const city = data.city || "Local";
+                const category = data.category || "General Threat";
+                
+                let formattedTime = new Date().toLocaleTimeString();
+                if(data.timestamp) {
+                    const parsedDate = new Date(data.timestamp);
+                    if(!isNaN(parsedDate)) formattedTime = parsedDate.toLocaleTimeString();
+                }
+                
+                totalCount++;
+                document.getElementById('stat-total-alerts').innerText = totalCount;
+                
+                if(parseInt(data.severity) === 1 || data.severity === "1") { 
+                    criticalCount++; 
+                } else { 
+                    suspiciousCount++; 
+                }
+                document.getElementById('stat-critical').innerText = criticalCount;
+                document.getElementById('stat-suspicious').innerText = suspiciousCount;
+
+                if (sig.includes("exploit") || sig.includes("blue") || sig.includes("shock") || sig.includes("cve")) threatData['Exploits/CVEs']++;
+                else if (sig.includes("flood") || sig.includes("dos") || sig.includes("syn") || sig.includes("attack")) threatData['DoS/Flooding']++;
+                else if (sig.includes("sql") || sig.includes("admin") || sig.includes("traversal") || sig.includes("php")) threatData['Web Attacks']++;
+                else if (sig.includes("brute") || sig.includes("login") || sig.includes("password")) threatData['Brute Force']++;
+                else if (sig.includes("scan") || sig.includes("nmap") || sig.includes("port") || sig.includes("ping") || sig.includes("icmp")) threatData['Recon/Scans']++;
+                else if (sig.includes("stream") || sig.includes("thread") || sig.includes("anomaly")) threatData['Anomalies']++;
+                else if (sig.includes("info") || sig.includes("spotify") || sig.includes("kali") || sig.includes("p2p") || sig.includes("dhcp")) threatData['Policy/Info']++;
+                else threatData['Miscellaneous']++;
+                
+                threatChart.data.datasets[0].data = Object.values(threatData);
+                threatChart.update();
+
+                trafficChart.data.labels.push(formattedTime);
+                trafficChart.data.datasets[0].data.push(totalCount);
+                if(trafficChart.data.labels.length > 10) { 
+                    trafficChart.data.labels.shift(); 
+                    trafficChart.data.datasets[0].data.shift(); 
+                }
+                trafficChart.update();
+
+                // Dynamic Table Append
+                const tableBody = document.getElementById('alert-table-body');
+                const row = document.createElement('tr');
+                row.className = 'alert-row hover:bg-slate-900/50 cursor-pointer text-xs border-b border-slate-800/50';
+                
+                const safeTitle = signatureRaw.replace(/'/g, "\\'");
+                const safeDesc = (data.description || "Signature rule matched during real-time network evaluation.").replace(/'/g, "\\'");
+                const safeProto = proto.replace(/'/g, "\\'");
+                const safeDest = destIp.replace(/'/g, "\\'");
+                const safeGeo = `${city}, ${country}`.replace(/'/g, "\\'");
+                const safeCat = category.replace(/'/g, "\\'");
+
+                row.setAttribute('onclick', `openModal('${safeTitle}', '${safeDesc}', '${safeProto}', '${safeDest}', '${safeGeo}', '${safeCat}')`);
+
+                row.innerHTML = `
+                    <td class="p-3 md:p-4 font-mono text-slate-400 whitespace-nowrap">${formattedTime}</td>
+                    <td class="p-3 md:p-4 font-mono">
+                        <div class="font-bold text-slate-200">${srcIp}</div>
+                        <div class="text-[10px] text-slate-500">${city}, ${country}</div>
+                    </td>
+                    <td class="p-3 md:p-4">
+                        <div class="font-semibold text-red-400">${signatureRaw}</div>
+                        <div class="text-[10px] text-slate-500 uppercase font-mono">${proto} &bull; ${category}</div>
+                    </td>
+                    <td class="p-3 md:p-4">
+                        <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase ${parseInt(data.severity) === 1 ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-yellow-950 text-yellow-400 border border-yellow-800'}">
+                            ${parseInt(data.severity) === 1 ? 'Critical' : 'Alert'}
+                        </span>
+                    </td>
+                    <td class="p-3 md:p-4 text-right">
+                        <button onclick="event.stopPropagation(); deleteAlert('${alertId}', this)" class="text-slate-500 hover:text-red-400 p-2 transition">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+
+                tableBody.insertBefore(row, tableBody.firstChild);
+
+                if (tableBody.children.length > 50) {
+                    tableBody.removeChild(tableBody.lastChild);
+                }
+            } catch (err) {
+                console.error("Error processing stream node:", err);
+            }
+        });
     }
 </script>
 </body>

@@ -23,15 +23,9 @@ ALERT_COOLDOWN_SECONDS = 60
 last_sent_times = {}
 
 print("✅ NIDS Client Engine Ready (Serverless REST Auth Mode)")
-<<<<<<< HEAD
-
-def authenticate_user():
-=======
-
 
 def authenticate_user():
     """Authenticates the user against Firebase Auth via REST API and sets alert delivery email."""
->>>>>>> 91f6adaa8070a7fbaaf10b52ea738bc65c387c01
     if "--logout" in sys.argv and os.path.exists(CONFIG_FILE):
         os.remove(CONFIG_FILE)
         print("🚪 Logged out active sensor session.")
@@ -85,10 +79,6 @@ def authenticate_user():
     print(f"📧 Alert destination set to: [{alert_email}]")
     print(f"💾 Session saved to {CONFIG_FILE}\n")
     return uid, user_email, alert_email, id_token
-<<<<<<< HEAD
-=======
-
->>>>>>> 91f6adaa8070a7fbaaf10b52ea738bc65c387c01
 
 def send_critical_email(recipient_email, payload):
     signature = payload.get("signature", "Unknown Threat")
@@ -161,15 +151,11 @@ def get_ip_location(ip_address):
     return {"country": "Unknown", "city": "Unknown", "lat": 0, "lon": 0}
 
 def run_bridge():
-<<<<<<< HEAD
-    sensor_uid, owner_email, alert_email, id_token = authenticate_user()
-=======
     # Dynamic Authentication Check via REST API token
     sensor_uid, owner_email, alert_email, id_token = authenticate_user()
     
->>>>>>> 91f6adaa8070a7fbaaf10b52ea738bc65c387c01
-    print(f"🛡️ NIDS LIVE: Routing logs to user path [/users/{sensor_uid}/network_alerts]...")
-    db_endpoint = f"{DB_URL}users/{sensor_uid}/network_alerts.json?auth={id_token}"
+    print(f"🛡️ NIDS LIVE: Routing logs to user path [/nids_alerts/{sensor_uid}]...")
+    db_endpoint = f"{DB_URL}nids_alerts/{sensor_uid}.json?auth={id_token}"
 
     if not os.path.exists(EVE_FILE):
         print(f"Creating missing log file: {EVE_FILE}")
@@ -209,17 +195,11 @@ def run_bridge():
                         "lon": geo['lon']
                     }
                     
-<<<<<<< HEAD
-                    requests.post(db_endpoint, json=payload)
-                    print(f"🚀 Cloud Alert Pushed to Dashboard for [{owner_email}]")
-                    
-=======
                     # Push alert using secure REST API with user token
                     requests.post(db_endpoint, json=payload)
                     print(f"🚀 Cloud Alert Pushed to Dashboard for [{owner_email}]")
                     
                     # Dispatch critical email if necessary
->>>>>>> 91f6adaa8070a7fbaaf10b52ea738bc65c387c01
                     if severity == 1 or "Nmap" in signature or "Exploit" in signature:
                         send_critical_email(alert_email, payload)
             except json.JSONDecodeError:
