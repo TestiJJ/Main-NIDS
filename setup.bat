@@ -2,10 +2,20 @@
 TITLE NIDS Ultimate Automated Setup
 COLOR 0A
 
+:: Ensure script runs with Administrator privileges
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [!] ERROR: Please right-click this script and select "Run as administrator".
+    goto error
+)
+
 echo ===================================================
 echo     NIDS Agent & Environment Full Auto-Installer
 echo ===================================================
 echo.
+
+:: Set script root directory
+set "SCRIPT_DIR=%~dp0"
 
 :: 1. Check if Python is installed
 python --version >nul 2>&1
@@ -22,8 +32,10 @@ if %errorlevel% neq 0 (
     echo [*] Installing Python silently and adding to PATH (this may take a moment)...
     "%TEMP%\python_installer.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_launcher=1
     
-    :: Refresh environment variables for the current command window
+    :: Refresh environment variables for the current command window session safely
     refreshenv >nul 2>&1
+    call refreshenv >nul 2>&1
+    set "PATH=%PATH%;C:\Program Files\Python311\;C:\Program Files\Python311\Scripts\"
     timeout /t 3 >nul
 ) else (
     echo [+] Python is already installed.
@@ -62,10 +74,24 @@ if not exist "C:\Program Files\Suricata" (
     echo [+] Suricata is already installed.
 )
 
-:: 3. Upgrade pip and install required dependencies
-echo [*] Installing required Python libraries (requests)...
-python -m pip install --upgrade pip >nul 2>&1
-python -m pip install requests
+:: 3. Create opt directory, copy files if present, and install pip packages
+echo [*] Setting up agent environment directory...
+if not exist "C:\nids_agent" mkdir "C:\nids_agent"
+
+if exist "%SCRIPT_DIR%nids_bridge.py" (
+    copy /y "%SCRIPT_DIR%nids_bridge.py" "C:\nids_agent\" >nul
+)
+
+if exist "%SCRIPT_DIR%requirements.txt" (
+    copy /y "%SCRIPT_DIR%requirements.txt" "C:\nids_agent\" >nul
+    echo [*] Installing required Python libraries from requirements.txt...
+    python -m pip install --upgrade pip >nul 2>&1
+    python -m pip install -r "C:\nids_agent\requirements.txt"
+) else (
+    echo [*] requirements.txt not found. Installing default 'requests' and 'firebase-admin'...
+    python -m pip install --upgrade pip >nul 2>&1
+    python -m pip install requests firebase-admin
+)
 
 if %errorlevel% neq 0 (
     echo [!] ERROR: Failed to install required libraries via pip.
@@ -78,7 +104,7 @@ echo.
 echo ===================================================
 echo     Setup complete! Everything is installed.
 echo     You can now run your agent:
-echo     python nids_bridge.py
+echo     python C:\nids_agent\nids_bridge.py
 echo ===================================================
 echo.
 pause
@@ -86,7 +112,7 @@ exit
 
 :error
 echo.
-echo [!] Setup failed. Please ensure you ran this script as Administrator!
+echo [!] Setup failed. Please review the errors above.
 echo.
 pause
 exit
