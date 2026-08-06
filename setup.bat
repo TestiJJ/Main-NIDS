@@ -1,30 +1,52 @@
 @echo off
-TITLE NIDS Security Setup
+TITLE NIDS Ultimate Automated Setup
 COLOR 0A
 
-echo =======================================
-echo          NIDS Agent Setup for Windows
-echo =======================================
+echo ===================================================
+echo     NIDS Agent & Environment Full Auto-Installer
+echo ===================================================
 echo.
 
-:: 1. Check if Python is installed and added to PATH
+:: 1. Check if Python is installed
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [!] ERROR: Python is not detected or not added to PATH.
-    echo [!] Please install Python from python.org and ensure "Add python.exe to PATH" is checked.
+    echo [*] Python not detected. Downloading Python installer...
+    
+    powershell -Command "Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe' -OutFile '%TEMP%\python_installer.exe'"
+    
+    if not exist "%TEMP%\python_installer.exe" (
+        echo [!] ERROR: Failed to download Python. Check your internet connection.
+        goto error
+    )
+
+    echo [*] Installing Python silently and adding to PATH (this may take a moment)...
+    "%TEMP%\python_installer.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_launcher=1
+    
+    :: Refresh environment variables for the current command window
+    refreshenv >nul 2>&1
+    timeout /t 3 >nul
+) else (
+    echo [+] Python is already installed.
+)
+
+:: Verify Python is now working
+python --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [!] ERROR: Python installation finished, but it is not available in PATH.
+    echo [!] Please restart your terminal/PC and run this script again.
     goto error
 ) else (
-    echo [+] Python detected successfully.
+    echo [+] Python is verified and ready.
 )
 
 :: 2. Download and Install Suricata automatically
 echo [*] Checking/Downloading Suricata for Windows...
 if not exist "C:\Program Files\Suricata" (
     echo [*] Downloading Suricata installer...
-    powershell -Command "Invoke-WebRequest -Uri 'https://www.openinfosecfoundation.org/downloads/windows/Suricata-7.0.6-1-64bit.msi' -OutFile '%TEMP%\suricata.msi'"
+    powershell -Command "Invoke-WebRequest -Uri 'https://www.openinfosecfoundation.org/downloads/windows/Suricata-7.0.17-1-64bit.msi' -OutFile '%TEMP%\suricata.msi'"
     
     if not exist "%TEMP%\suricata.msi" (
-        echo [!] ERROR: Failed to download Suricata installer. Check your internet connection.
+        echo [!] ERROR: Failed to download Suricata installer.
         goto error
     )
 
@@ -49,19 +71,22 @@ if %errorlevel% neq 0 (
     echo [!] ERROR: Failed to install required libraries via pip.
     goto error
 ) else (
-    echo [+] All dependencies installed successfully!
+    echo [+] All Python dependencies installed successfully!
 )
 
 echo.
-echo =======================================
-echo   Setup complete! You can now run your agent:
-echo   python nids_bridge.py
-echo =======================================
+echo ===================================================
+echo     Setup complete! Everything is installed.
+echo     You can now run your agent:
+echo     python nids_bridge.py
+echo ===================================================
+echo.
 pause
 exit
 
 :error
 echo.
-echo [!] Setup failed. Please fix the error above and try again.
+echo [!] Setup failed. Please ensure you ran this script as Administrator!
+echo.
 pause
 exit
