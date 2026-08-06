@@ -1,4 +1,3 @@
-cat << 'EOF' > nids_bridge.py
 import json
 import time
 import os
@@ -222,4 +221,3 @@ def run_bridge():
 
 if __name__ == "__main__":
     run_bridge()
-EOF
