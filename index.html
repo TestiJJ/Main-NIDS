@@ -230,64 +230,30 @@
                 </div>
             </section>
 
-                                <!-- OS Download Center Section -->
+                          <!-- OS Download Center Section -->
             <section id="downloads" class="glass rounded-2xl p-4 md:p-8 mb-10">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
                         <h3 class="font-bold font-cyber uppercase tracking-widest text-xs md:text-sm">Sensor Executable Downloads</h3>
-                        <p class="text-slate-400 text-xs">Download and deploy the pre-compiled NIDS Python bridge executable for your target operating system.</p>
+                        <p class="text-slate-400 text-xs">Download and deploy the cross-platform NIDS release package containing setup scripts and bridge code.</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Windows Build Card -->
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-red-800 transition">
+                <div class="grid grid-cols-1 md:grid-cols-1 gap-6 max-w-xl mx-auto">
+                    <!-- Unified Release Package Card -->
+                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-red-800 transition">
                         <div>
                             <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 rounded-xl bg-blue-950/60 border border-blue-900/50 flex items-center justify-center text-blue-400 text-lg">
-                                    <i class="fab fa-windows"></i>
+                                <div class="w-10 h-10 rounded-xl bg-red-950/60 border border-red-900/50 flex items-center justify-center text-red-400 text-lg">
+                                    <i class="fas fa-file-archive"></i>
                                 </div>
-                                <span class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-full text-slate-300 font-bold uppercase">x64 Binary</span>
+                                <span class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-full text-slate-300 font-bold uppercase">Cross-Platform Package</span>
                             </div>
-                            <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">Windows Agent</h4>
-                            <p class="text-slate-400 text-xs mb-6">Compiled standalone executable for Windows Server and Workstation environments. Requires Npcap driver.</p>
+                            <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">NIDS Release Bundle</h4>
+                            <p class="text-slate-400 text-xs mb-6">Includes `nids_bridge.py`, requirements, and automated setup scripts (`setup.bat` and `install.sh`) for Windows, Linux, and macOS environments.</p>
                         </div>
-                        <a href="https://github.com/Testijj/Main-NIDS/releases/latest/download/nids_agent_windows.zip" class="w-full bg-blue-950/40 border border-blue-900/50 hover:bg-blue-900 text-blue-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition block">
-                            <i class="fas fa-download mr-1.5"></i> Download (.zip)
-                        </a>
-                    </div>
-
-                    <!-- Linux / Kali Build Card -->
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-red-800 transition">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 rounded-xl bg-orange-950/60 border border-orange-900/50 flex items-center justify-center text-orange-400 text-lg">
-                                    <i class="fab fa-linux"></i>
-                                </div>
-                                <span class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-full text-slate-300 font-bold uppercase">ELF Binary</span>
-                            </div>
-                            <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">Linux / Kali Agent</h4>
-                            <p class="text-slate-400 text-xs mb-6">Native ELF binary optimized for Ubuntu, Debian, and Kali Linux security auditing nodes with libpcap.</p>
-                        </div>
-                        <a href="https://github.com/Testijj/Main-NIDS/releases/latest/download/nids_agent_linux.tar.gz" class="w-full bg-orange-950/40 border border-orange-900/50 hover:bg-orange-900 text-orange-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition block">
-                            <i class="fas fa-download mr-1.5"></i> Download (.tar.gz)
-                        </a>
-                    </div>
-
-                    <!-- macOS Build Card -->
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between hover:border-red-800 transition">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 text-lg">
-                                    <i class="fab fa-apple"></i>
-                                </div>
-                                <span class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-full text-slate-300 font-bold uppercase">Universal</span>
-                            </div>
-                            <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">macOS Agent</h4>
-                            <p class="text-slate-400 text-xs mb-6">Mach-O binary package tailored for Apple Silicon (M1/M2/M3) and Intel macOS surveillance instances.</p>
-                        </div>
-                        <a href="https://github.com/Testijj/Main-NIDS/releases/latest/download/nids_agent_macos.tar.gz" class="w-full bg-slate-800/80 border border-slate-700 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition block">
-                            <i class="fas fa-download mr-1.5"></i> Download (.tar.gz)
+                        <a href="https://github.com/TestiJJ/Main-NIDS/releases/latest/download/NIDS_Release.zip" class="w-full bg-red-950/40 border border-red-900/50 hover:bg-red-900 text-red-300 font-bold text-xs py-3 px-4 rounded-xl text-center uppercase tracking-wider transition block">
+                            <i class="fas fa-download mr-1.5"></i> Download NIDS_Release.zip
                         </a>
                     </div>
                 </div>
