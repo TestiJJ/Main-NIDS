@@ -21,10 +21,20 @@ if %errorlevel% neq 0 (
 echo [*] Checking/Downloading Suricata for Windows...
 if not exist "C:\Program Files\Suricata" (
     echo [*] Downloading Suricata installer...
-    powershell -Command "Invoke-WebRequest -Uri 'https://www.openinfosecfoundation.org/download/windows/Suricata-6.0.10-64bit.msi' -OutFile '%TEMP%\suricata.msi'"
+    powershell -Command "Invoke-WebRequest -Uri 'https://www.openinfosecfoundation.org/downloads/windows/Suricata-7.0.6-1-64bit.msi' -OutFile '%TEMP%\suricata.msi'"
     
+    if not exist "%TEMP%\suricata.msi" (
+        echo [!] ERROR: Failed to download Suricata installer. Check your internet connection.
+        goto error
+    )
+
     echo [*] Installing Suricata silently...
     msiexec.exe /i "%TEMP%\suricata.msi" /quiet /norestart
+    
+    if %errorlevel% neq 0 (
+        echo [!] ERROR: Suricata installation failed.
+        goto error
+    )
     echo [+] Suricata installed successfully!
 ) else (
     echo [+] Suricata is already installed.
