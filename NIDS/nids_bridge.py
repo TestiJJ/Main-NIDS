@@ -10,7 +10,12 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 DB_URL = 'https://nids-3f976-default-rtdb.firebaseio.com/'
-EVE_FILE = '/var/log/suricata/eve.json'
+# Dynamic OS path routing for Suricata logs
+if sys.platform.startswith('win'):
+    EVE_FILE = r"C:\ProgramData\Suricata\log\eve.json"
+else:
+    EVE_FILE = '/var/log/suricata/eve.json'
+
 CONFIG_FILE = 'sensor_config.json'
 FIREBASE_WEB_API_KEY = "AIzaSyCVS9na3K2hE9yyWWJulcBKHPXFkiMRExk"
 
@@ -25,7 +30,7 @@ last_sent_times = {}
 print("✅ NIDS Client Engine Ready (Serverless REST Auth Mode)")
 
 def authenticate_user():
-    """Authenticates the user against Firebase Auth via REST API and sets alert delivery email."""
+    """Authenticates the user against Firebase Auth via REST API and sets multiple alert delivery emails."""
     if "--logout" in sys.argv and os.path.exists(CONFIG_FILE):
         os.remove(CONFIG_FILE)
         print("🚪 Logged out active sensor session.")
@@ -34,10 +39,10 @@ def authenticate_user():
         try:
             with open(CONFIG_FILE, 'r') as f:
                 config = json.load(f)
-                if config.get("uid") and config.get("email") and config.get("alert_email") and config.get("idToken"):
+                if config.get("uid") and config.get("email") and config.get("alert_emails") and config.get("idToken"):
                     print(f"🔑 Active Sensor Owner: {config['email']} (UID: {config['uid']})")
-                    print(f"📧 Threat Notifications Routed to: {config['alert_email']}")
-                    return config["uid"], config["email"], config["alert_email"], config["idToken"]
+                    print(f"📧 Threat Notifications Routed to: {config['alert_emails']}")
+                    return config["uid"], config["email"], config["alert_emails"], config["idToken"]
         except Exception:
             pass
 
@@ -63,24 +68,28 @@ def authenticate_user():
     id_token = user_data['idToken']
 
     print("\n📩 NOTIFICATION SETUP:")
-    alert_email = input(f"Enter Email for Instant Threat Alerts [Press ENTER for {user_email}]: ").strip()
-    if not alert_email:
-        alert_email = user_email
+    print("You can enter multiple admin emails separated by commas (e.g., admin1@gmail.com, admin2@gmail.com, admin3@gmail.com)")
+    raw_input_emails = input(f"Enter Alert Emails [Press ENTER for just {user_email}]: ").strip()
+    
+    if not raw_input_emails:
+        alert_emails = [user_email]
+    else:
+        alert_emails = [e.strip() for e in raw_input_emails.split(",") if e.strip()]
 
     with open(CONFIG_FILE, 'w') as f:
         json.dump({
             "uid": uid, 
             "email": user_email,
-            "alert_email": alert_email,
+            "alert_emails": alert_emails,
             "idToken": id_token
         }, f, indent=4)
 
     print(f"\n✅ Authenticated successfully as [{user_email}]!")
-    print(f"📧 Alert destination set to: [{alert_email}]")
+    print(f"📧 Alert destinations set to: {alert_emails}")
     print(f"💾 Session saved to {CONFIG_FILE}\n")
-    return uid, user_email, alert_email, id_token
+    return uid, user_email, alert_emails, id_token
 
-def send_critical_email(recipient_email, payload):
+def send_critical_email(recipient_emails, payload):
     signature = payload.get("signature", "Unknown Threat")
     src_ip = payload.get("src_ip", "0.0.0.0")
     country = payload.get("country", "Unknown")
@@ -92,8 +101,11 @@ def send_critical_email(recipient_email, payload):
     current_time = time.time()
     
     if dedup_key in last_sent_times and (current_time - last_sent_times[dedup_key]) < ALERT_COOLDOWN_SECONDS:
-        print(f"⏳ Throttled duplicate email for [{signature}] from [{src_ip}] (Suppressed)")
+        print(f"⏳ Throttled duplicate email batch for [{signature}] from [{src_ip}] (Suppressed)")
         return
+
+    if isinstance(recipient_emails, str):
+        recipient_emails = [recipient_emails]
 
     subject = f"🚨 [CRITICAL ALERT] Incident Detected: {signature}"
     html_content = f"""
@@ -116,22 +128,25 @@ def send_critical_email(recipient_email, payload):
     </html>
     """
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = SENDER_EMAIL
-    msg["To"] = recipient_email
-    msg.attach(MIMEText(html_content, "html"))
-
     try:
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
-        server.sendmail(SENDER_EMAIL, recipient_email, msg.as_string())
+        
+        for email in recipient_emails:
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = SENDER_EMAIL
+            msg["To"] = email.strip()
+            msg.attach(MIMEText(html_content, "html"))
+            
+            server.sendmail(SENDER_EMAIL, email.strip(), msg.as_string())
+            print(f"📧 Critical Email Dispatched to Alert Inbox ({email.strip()}) for [{signature}]")
+            
         server.quit()
         last_sent_times[dedup_key] = current_time
-        print(f"📧 Critical Email Dispatched to Alert Inbox ({recipient_email}) for [{signature}]")
     except Exception as e:
-        print(f"❌ Failed to send alert email: {e}")
+        print(f"❌ Failed to send alert email batch: {e}")
 
 def get_ip_location(ip_address):
     if not ip_address or ip_address.startswith(("127.", "192.168.", "10.", "172.16.", "169.254.")):
@@ -151,8 +166,7 @@ def get_ip_location(ip_address):
     return {"country": "Unknown", "city": "Unknown", "lat": 0, "lon": 0}
 
 def run_bridge():
-    # Dynamic Authentication Check via REST API token
-    sensor_uid, owner_email, alert_email, id_token = authenticate_user()
+    sensor_uid, owner_email, alert_emails, id_token = authenticate_user()
     
     print(f"🛡️ NIDS LIVE: Routing logs to user path [/nids_alerts/{sensor_uid}]...")
     db_endpoint = f"{DB_URL}nids_alerts/{sensor_uid}.json?auth={id_token}"
@@ -195,13 +209,11 @@ def run_bridge():
                         "lon": geo['lon']
                     }
                     
-                    # Push alert using secure REST API with user token
                     requests.post(db_endpoint, json=payload)
                     print(f"🚀 Cloud Alert Pushed to Dashboard for [{owner_email}]")
                     
-                    # Dispatch critical email if necessary
                     if severity == 1 or "Nmap" in signature or "Exploit" in signature:
-                        send_critical_email(alert_email, payload)
+                        send_critical_email(alert_emails, payload)
             except json.JSONDecodeError:
                 continue
             except Exception as e:

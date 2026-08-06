@@ -8,3 +8,4 @@ capture.pcap
 eve.json
 sensor_config.json
 serviceAccountKey.json
+NIDS_Release/
