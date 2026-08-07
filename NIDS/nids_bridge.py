@@ -168,7 +168,7 @@ def run_bridge():
     sensor_uid, owner_email, alert_emails, id_token = authenticate_user()
     
     print(f"🛡️ NIDS LIVE: Routing logs to user path [/nids_alerts/{sensor_uid}]...")
-    db_endpoint = f"{DB_URL}nids_alerts/{sensor_uid}.json?auth={id_token}"
+    db_endpoint = f"{DB_URL}users/{sensor_uid}/network_alerts.json?auth={id_token}"
 
     if not os.path.exists(EVE_FILE):
         print(f"Creating missing log file: {EVE_FILE}")
