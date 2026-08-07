@@ -5,6 +5,7 @@ import sys
 import getpass
 import requests
 import smtplib
+import traceback
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -67,7 +68,7 @@ def authenticate_user():
     id_token = user_data['idToken']
 
     print("\n📩 NOTIFICATION SETUP:")
-    print("You can enter multiple admin emails separated by commas (e.g., admin1@gmail.com, admin2@gmail.com, admin3@gmail.com)")
+    print("You can enter multiple admin emails separated by commas (e.g., admin1@gmail.com, admin2@gmail.com)")
     raw_input_emails = input(f"Enter Alert Emails [Press ENTER for just {user_email}]: ").strip()
     
     if not raw_input_emails:
@@ -148,10 +149,10 @@ def send_critical_email(recipient_emails, payload):
         print(f"❌ Failed to send alert email batch: {e}")
 
 def get_ip_location(ip_address):
-    if not ip_address or ip_address.startswith(("127.", "192.168.", "10.", "172.16.", "169.254.")):
+    if not ip_address or ip_address.startswith(("127.", "192.168.", "10.", "172.", "169.254.")):
         return {"country": "Internal Network", "city": "Local", "lat": 0, "lon": 0}
     try:
-        response = requests.get(f"http://ip-api.com/json/{ip_address}", timeout=5)
+        response = requests.get(f"http://ip-api.com/json/{ip_address}", timeout=2)
         data = response.json()
         if data.get('status') == 'success':
             return {
@@ -160,15 +161,15 @@ def get_ip_location(ip_address):
                 "lat": data.get('lat', 0),
                 "lon": data.get('lon', 0)
             }
-    except Exception as e:
-        print(f"⚠️ Geo-IP API Error: {e}")
-    return {"country": "Unknown", "city": "Unknown", "lat": 0, "lon": 0}
+    except Exception:
+        pass
+    return {"country": "Internal/Unknown", "city": "Local", "lat": 0, "lon": 0}
 
 def run_bridge():
     sensor_uid, owner_email, alert_emails, id_token = authenticate_user()
     
-    print(f"🛡️ NIDS LIVE: Routing logs to user path [/nids_alerts/{sensor_uid}]...")
-    db_endpoint = f"{DB_URL}users/{sensor_uid}/network_alerts.json?auth={id_token}"
+    print(f"🛡️ NIDS LIVE: Routing logs to root database path [/network_alerts]...")
+    db_endpoint = f"{DB_URL}network_alerts.json?auth={id_token}"
 
     if not os.path.exists(EVE_FILE):
         print(f"Creating missing log file: {EVE_FILE}")
@@ -208,8 +209,11 @@ def run_bridge():
                         "lon": geo['lon']
                     }
                     
-                    requests.post(db_endpoint, json=payload)
-                    print(f"🚀 Cloud Alert Pushed to Dashboard for [{owner_email}]")
+                    res = requests.post(db_endpoint, json=payload)
+                    if res.status_code == 200:
+                        print(f"🚀 Cloud Alert Pushed to Dashboard for [{owner_email}]")
+                    else:
+                        print(f"❌ Firebase Rejected Write ({res.status_code}): {res.text}")
                     
                     if severity == 1 or "Nmap" in signature or "Exploit" in signature:
                         send_critical_email(alert_emails, payload)
@@ -217,6 +221,7 @@ def run_bridge():
                 continue
             except Exception as e:
                 print(f"❌ Loop Error: {e}")
+                traceback.print_exc()
                 continue
 
 if __name__ == "__main__":
