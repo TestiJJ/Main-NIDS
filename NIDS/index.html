@@ -229,43 +229,83 @@
                     </table>
                 </div>
             </section>
-
-           <!-- OS Download Center Section -->
+<!-- OS Download Center Section -->
 <section id="downloads" class="glass rounded-2xl p-4 md:p-8 mb-10">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-            <h3 class="font-bold font-cyber uppercase tracking-widest text-xs md:text-sm">Sensor Deployment Center</h3>
-            <p class="text-slate-400 text-xs">Clone the repository for instant Linux setup or download the cross-platform release bundle.</p>
+            <h3 class="font-bold font-cyber uppercase tracking-widest text-xs md:text-sm text-white">Sensor Deployment Center</h3>
+            <p class="text-slate-400 text-xs">Deploy the sensor instantly on Linux using the automated script or configure it for Windows.</p>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+    <!-- Dual Grid Cards for Linux and Windows -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        
         <!-- Linux Quick Deploy Card -->
-        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-red-800 transition">
+        <div class="bg-gradient-to-b from-slate-900/80 to-slate-950 border border-red-900/40 rounded-2xl p-6 flex flex-col justify-between shadow-lg shadow-red-950/20 hover:border-red-700/60 transition duration-300">
             <div>
                 <div class="flex items-center justify-between mb-4">
-                    <div class="w-10 h-10 rounded-xl bg-red-950/60 border border-red-900/50 flex items-center justify-center text-red-400 text-lg">
+                    <div class="w-12 h-12 rounded-xl bg-red-950/80 border border-red-800/50 flex items-center justify-center text-red-400 text-xl shadow-inner">
                         <i class="fab fa-linux"></i>
                     </div>
-                    <span class="text-[10px] bg-red-950 px-2.5 py-1 rounded-full text-red-300 font-bold uppercase border border-red-900">Recommended Linux</span>
+                    <span class="text-[10px] bg-red-950/90 text-red-300 border border-red-800/60 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Linux Deployment</span>
                 </div>
-                <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">Automated Linux Setup</h4>
-                <p class="text-slate-400 text-xs mb-4">Instantly clone and run the automated provisioning script to configure Suricata and bridge code.</p>
+                <h4 class="font-bold font-cyber text-white text-base mb-1.5 uppercase tracking-wider">Automated Linux Setup</h4>
+                <p class="text-slate-400 text-xs mb-5 leading-relaxed">Clones the repository shallowly, configures environment components, and runs the provisioning script.</p>
             </div>
-            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-[10px] text-red-400 overflow-x-auto select-all mb-4">
-                git clone https://github.com/TestiJJ/Main-NIDS.git && cd Main-NIDS && chmod +x install.sh && sudo ./install.sh
+            <div class="space-y-3">
+                <div class="p-3 bg-black/70 rounded-xl border border-slate-800 font-mono text-[10px] text-red-400 overflow-x-auto select-all">
+                    git clone --depth 1 https://github.com/TestiJJ/Main-NIDS.git && cd Main-NIDS && chmod +x install.sh && sudo ./install.sh
+                </div>
+                <button onclick="copyCommandFromElement(this)" class="w-full bg-red-950/40 border border-red-900/50 hover:bg-red-900 text-red-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition flex items-center justify-center gap-2">
+                    <i class="fas fa-copy"></i> Copy Linux Command
+                </button>
             </div>
-            <button onclick="copyCommandFromElement(this)" class="w-full bg-red-950/40 border border-red-900/50 hover:bg-red-900 text-red-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition">
-                <i class="fas fa-copy mr-1.5"></i> Copy Linux Command
-            </button>
         </div>
 
-        <!-- Cross-Platform Package Card -->
-        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-slate-700 transition">
+        <!-- Windows Deployment Card -->
+        <div class="bg-gradient-to-b from-slate-900/80 to-slate-950 border border-blue-900/40 rounded-2xl p-6 flex flex-col justify-between shadow-lg shadow-blue-950/20 hover:border-blue-700/60 transition duration-300">
             <div>
-                
-                        </div>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-950/80 border border-blue-800/50 flex items-center justify-center text-blue-400 text-xl shadow-inner">
+                        <i class="fab fa-windows"></i>
+                    </div>
+                    <span class="text-[10px] bg-blue-950/90 text-blue-300 border border-blue-800/60 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Windows Deployment</span>
+                </div>
+                <h4 class="font-bold font-cyber text-white text-base mb-1.5 uppercase tracking-wider">Automated Windows Setup</h4>
+                <p class="text-slate-400 text-xs mb-5 leading-relaxed">Clones the repository via PowerShell and automatically runs the setup batch configuration.</p>
+            </div>
+            <div class="space-y-3">
+                <div class="p-3 bg-black/70 rounded-xl border border-slate-800 font-mono text-[10px] text-blue-400 overflow-x-auto select-all">
+                    git clone --depth 1 https://github.com/TestiJJ/Main-NIDS.git; cd Main-NIDS; .\setup.bat
+                </div>
+                <button onclick="copyCommandFromElement(this)" class="w-full bg-blue-950/40 border border-blue-900/50 hover:bg-blue-900 text-blue-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition flex items-center justify-center gap-2">
+                    <i class="fas fa-copy"></i> Copy Windows Command
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Troubleshooting Network Drops Guide -->
+    <div class="mt-6 max-w-4xl mx-auto p-4 bg-slate-900/40 border border-slate-800 rounded-xl">
+        <h5 class="font-bold font-cyber text-xs text-slate-300 uppercase mb-2 flex items-center gap-2">
+            <i class="fas fa-exclamation-triangle text-amber-400"></i> Encountering Git Timeout / SSL Errors?
+        </h5>
+        <p class="text-slate-400 text-xs mb-3 leading-relaxed">
+            If your network drops or throws a GnuTLS/RPC timeout error during cloning, run these commands first to stabilize your buffer:
+        </p>
+        <div class="p-3 bg-black/70 rounded-lg border border-slate-800 font-mono text-[10px] text-amber-300 overflow-x-auto select-all mb-2">
+            git config --global http.postBuffer 1048576000<br>
+            git config --global http.lowSpeedLimit 0<br>
+            git config --global http.lowSpeedTime 999999
+        </div>
+        <p class="text-slate-400 text-[11px]">
+            Once configured, retry your copy-pasted deployment command.
+        </p>
+    </div>
 </section>
+
 
 
 
