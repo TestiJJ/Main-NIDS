@@ -547,8 +547,7 @@
             alert("Sensor UID copied! Set SENSOR_USER_ID = '" + uid + "' inside your nids_bridge.py script.");
         });
     }
-
-   // --- 3. REAL-TIME FIREBASE DATA SYNC ---
+// --- 3. REAL-TIME FIREBASE DATA SYNC ---
 auth.onAuthStateChanged((user) => {
     if (user) {
         currentUserId = user.uid;
@@ -570,6 +569,8 @@ auth.onAuthStateChanged((user) => {
         alertsRef.on('value', (snapshot) => {
             const data = snapshot.val();
             const tableBody = document.getElementById('alert-table-body');
+            
+            if (!tableBody) return;
             tableBody.innerHTML = '';
 
             let totalCount = 0;
@@ -614,10 +615,14 @@ auth.onAuthStateChanged((user) => {
                 });
             }
 
-            // Update Metric Counters
-            document.getElementById('stat-total-alerts').innerText = totalCount;
-            document.getElementById('stat-suspicious').innerText = suspiciousCount;
-            document.getElementById('stat-critical').innerText = criticalCount;
+            // Update Metric Counters Safely
+            const totalEl = document.getElementById('stat-total-alerts');
+            const suspEl = document.getElementById('stat-suspicious');
+            const critEl = document.getElementById('stat-critical');
+
+            if (totalEl) totalEl.innerText = totalCount;
+            if (suspEl) suspEl.innerText = suspiciousCount;
+            if (critEl) critEl.innerText = criticalCount;
         });
     } else {
         authOverlay.style.display = 'flex';
@@ -638,6 +643,7 @@ function clearAllLogs() {
         database.ref(`users/${currentUserId}/network_alerts`).remove();
     }
 }
+
 
 
     // --- 4. ACCOUNT SETTINGS & MODALS ---
