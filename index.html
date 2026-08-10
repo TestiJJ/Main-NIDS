@@ -548,30 +548,97 @@
         });
     }
 
-    // --- 3. LIFECYCLE MONITORING STATE WATCHER ---
-    auth.onAuthStateChanged((user) => {
-        if (user && user.emailVerified) {
-            currentUserId = user.uid;
-            authOverlay.style.display = 'none';
-            dashboardRoot.style.opacity = '1';
-            dashboardRoot.style.pointerEvents = 'auto';
-            
-            document.getElementById('sidebar-user-email').innerText = user.email;
-            document.getElementById('sidebar-user-uid').innerText = user.uid;
-            document.getElementById('header-user-welcome').innerText = user.email.split('@')[0];
-            document.getElementById('monitored-email-display').innerText = user.email;
-            document.getElementById('settings-email-readonly').value = user.email;
+   // --- 3. REAL-TIME FIREBASE DATA SYNC ---
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        currentUserId = user.uid;
+        
+        // Update user UI badges
+        document.getElementById('sidebar-user-email').innerText = user.email;
+        document.getElementById('sidebar-user-uid').innerText = user.uid;
+        document.getElementById('header-user-welcome').innerText = user.email.split('@')[0];
+        document.getElementById('monitored-email-display').innerText = user.email;
+        document.getElementById('settings-email-readonly').value = user.email;
 
-            initDatabaseStreams(user.uid);
-            initRulesStream(user.uid);
-        } else {
-            currentUserId = null;
-            authOverlay.style.display = 'flex';
-            dashboardRoot.style.opacity = '0';
-            dashboardRoot.style.pointerEvents = 'none';
-            detachDatabaseStreams();
-        }
-    });
+        // Reveal Dashboard
+        authOverlay.style.display = 'none';
+        dashboardRoot.classList.remove('opacity-0', 'pointer-events-none');
+
+        // Listen to live alerts from Firebase database path
+        const alertsRef = database.ref(`users/${user.uid}/network_alerts`);
+        
+        alertsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            const tableBody = document.getElementById('alert-table-body');
+            tableBody.innerHTML = '';
+
+            let totalCount = 0;
+            let suspiciousCount = 0;
+            let criticalCount = 0;
+            let alertsArray = [];
+
+            if (data) {
+                // Convert Firebase object map into an array with keys
+                alertsArray = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                }));
+
+                // Sort array so newest timestamps appear first
+                alertsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                alertsArray.forEach(alert => {
+                    totalCount++;
+                    if (alert.severity === 1) criticalCount++;
+                    if (alert.severity === 2 || alert.severity === 3) suspiciousCount++;
+
+                    // Render table row
+                    const row = document.createElement('tr');
+                    row.className = "alert-row border-b border-slate-800/60 hover:bg-slate-900/40 transition";
+                    row.innerHTML = `
+                        <td class="p-3 md:p-4 font-mono text-slate-400 text-[11px]">${alert.timestamp || 'N/A'}</td>
+                        <td class="p-3 md:p-4 font-mono font-bold text-slate-200">${alert.src_ip}</td>
+                        <td class="p-3 md:p-4 text-slate-300 font-medium">${alert.signature}</td>
+                        <td class="p-3 md:p-4">
+                            <span class="px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${alert.severity === 1 ? 'bg-red-950 text-red-400 border border-red-900' : 'bg-yellow-950 text-yellow-400 border border-yellow-900'}">
+                                ${alert.severity === 1 ? 'CRITICAL' : 'ALERT'}
+                            </span>
+                        </td>
+                        <td class="p-3 md:p-4 text-right">
+                            <button onclick="deleteAlert('${alert.id}')" class="text-slate-500 hover:text-red-400 transition p-1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Update Metric Counters
+            document.getElementById('stat-total-alerts').innerText = totalCount;
+            document.getElementById('stat-suspicious').innerText = suspiciousCount;
+            document.getElementById('stat-critical').innerText = criticalCount;
+        });
+    } else {
+        authOverlay.style.display = 'flex';
+        dashboardRoot.classList.add('opacity-0', 'pointer-events-none');
+    }
+});
+
+// Delete Single Log Helper
+function deleteAlert(alertId) {
+    if(currentUserId) {
+        database.ref(`users/${currentUserId}/network_alerts/${alertId}`).remove();
+    }
+}
+
+// Clear All Logs Helper
+function clearAllLogs() {
+    if(currentUserId && confirm("Are you sure you want to clear all intrusion logs?")) {
+        database.ref(`users/${currentUserId}/network_alerts`).remove();
+    }
+}
+
 
     // --- 4. ACCOUNT SETTINGS & MODALS ---
     function openSettingsModal() {
