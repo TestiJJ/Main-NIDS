@@ -230,34 +230,42 @@
                 </div>
             </section>
 
-                          <!-- OS Download Center Section -->
-            <section id="downloads" class="glass rounded-2xl p-4 md:p-8 mb-10">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <div>
-                        <h3 class="font-bold font-cyber uppercase tracking-widest text-xs md:text-sm">Sensor Executable Downloads</h3>
-                        <p class="text-slate-400 text-xs">Download and deploy the cross-platform NIDS release package containing setup scripts and bridge code.</p>
-                    </div>
-                </div>
+           <!-- OS Download Center Section -->
+<section id="downloads" class="glass rounded-2xl p-4 md:p-8 mb-10">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+            <h3 class="font-bold font-cyber uppercase tracking-widest text-xs md:text-sm">Sensor Deployment Center</h3>
+            <p class="text-slate-400 text-xs">Clone the repository for instant Linux setup or download the cross-platform release bundle.</p>
+        </div>
+    </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-1 gap-6 max-w-xl mx-auto">
-                    <!-- Unified Release Package Card -->
-                    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-red-800 transition">
-                        <div>
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 rounded-xl bg-red-950/60 border border-red-900/50 flex items-center justify-center text-red-400 text-lg">
-                                    <i class="fas fa-file-archive"></i>
-                                </div>
-                                <span class="text-[10px] bg-slate-800 px-2.5 py-1 rounded-full text-slate-300 font-bold uppercase">Cross-Platform Package</span>
-                            </div>
-                            <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">NIDS Release Bundle</h4>
-                            <p class="text-slate-400 text-xs mb-6">Includes `nids_bridge.py`, requirements, and automated setup scripts (`setup.bat` and `install.sh`) for Windows, Linux, and macOS environments.</p>
-                        </div>
-                        <a href="https://github.com/TestiJJ/Main-NIDS/releases/latest/download/NIDS_Release.zip" class="w-full bg-red-950/40 border border-red-900/50 hover:bg-red-900 text-red-300 font-bold text-xs py-3 px-4 rounded-xl text-center uppercase tracking-wider transition block">
-                            <i class="fas fa-download mr-1.5"></i> Download NIDS_Release.zip
-                        </a>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <!-- Linux Quick Deploy Card -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-red-800 transition">
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-red-950/60 border border-red-900/50 flex items-center justify-center text-red-400 text-lg">
+                        <i class="fab fa-linux"></i>
                     </div>
+                    <span class="text-[10px] bg-red-950 px-2.5 py-1 rounded-full text-red-300 font-bold uppercase border border-red-900">Recommended Linux</span>
                 </div>
-            </section>
+                <h4 class="font-bold font-cyber text-white text-sm mb-1 uppercase tracking-wider">Automated Linux Setup</h4>
+                <p class="text-slate-400 text-xs mb-4">Instantly clone and run the automated provisioning script to configure Suricata and bridge code.</p>
+            </div>
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-[10px] text-red-400 overflow-x-auto select-all mb-4">
+                git clone https://github.com/TestiJJ/Main-NIDS.git && cd Main-NIDS && chmod +x install.sh && sudo ./install.sh
+            </div>
+            <button onclick="copyCommandFromElement(this)" class="w-full bg-red-950/40 border border-red-900/50 hover:bg-red-900 text-red-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition">
+                <i class="fas fa-copy mr-1.5"></i> Copy Linux Command
+            </button>
+        </div>
+
+        <!-- Cross-Platform Package Card -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-slate-700 transition">
+            <div>
+                
+                        </div>
+</section>
 
 
 
