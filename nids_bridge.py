@@ -168,7 +168,7 @@ def get_ip_location(ip_address):
 def run_bridge():
     sensor_uid, owner_email, alert_emails, id_token = authenticate_user()
     
-    print(f"🛡️ NIDS LIVE: Routing logs to root database path [/network_alerts]...")
+    print(f"🛡️ NIDS LIVE: Routing logs to user database path [/users/{sensor_uid}/network_alerts]...")
     db_endpoint = f"{DB_URL}users/{sensor_uid}/network_alerts.json?auth={id_token}"
 
 
