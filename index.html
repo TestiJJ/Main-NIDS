@@ -564,7 +564,8 @@ auth.onAuthStateChanged((user) => {
         dashboardRoot.classList.remove('opacity-0', 'pointer-events-none');
 
         // Listen to live alerts from Firebase database path
-        const alertsRef = database.ref(`users/${user.uid}/network_alerts`);
+        initDatabaseStreams(user.uid);
+        initRulesStream(user.uid);
         
         alertsRef.on('value', (snapshot) => {
             const data = snapshot.val();
