@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "==================================================="
 echo "     NIDS Agent & Environment Full Auto-Installer"
-echo "===================================================""
+echo "==================================================="
 
 # Ensure script is run with root privileges
 if [ "$EUID" -ne 0 ]; then
@@ -15,7 +15,7 @@ OS="$(uname -s)"
 if [ "$OS" = "Linux" ]; then
     echo "[*] Detected Linux environment."
     echo "[*] Updating package manager and installing Suricata, Python 3, and pip..."
-    apt update && apt install -y suricata python3 python3-pip python3-venv
+    apt update && apt install -y suricata python3 python3-pip python3-venv jq
 
 elif [ "$OS" = "Darwin" ]; then
     echo "[*] Detected macOS environment."
@@ -32,12 +32,18 @@ else
     exit 1
 fi
 
+# Ensure Suricata service is enabled and running
+echo "[*] Configuring and starting Suricata service..."
+systemctl enable suricata
+systemctl start suricata
+
 # Create working directory and deploy components
 echo "[*] Deploying agent files to /opt/nids_agent..."
 mkdir -p /opt/nids_agent
 
 if [ -f "nids_bridge.py" ]; then
     cp nids_bridge.py /opt/nids_agent/
+    echo "[+] nids_bridge.py deployed successfully."
 else
     echo "[!] Warning: nids_bridge.py not found in current directory. Make sure to place it there."
 fi
@@ -62,4 +68,4 @@ echo "==================================================="
 echo "     Setup complete! Everything is installed."
 echo "     Run your agent using:"
 echo "     sudo python3 /opt/nids_agent/nids_bridge.py"
-echo "===================================================""
+echo "==================================================="

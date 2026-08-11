@@ -27,22 +27,46 @@ if %errorlevel% neq 0 (
     echo [+] Python detected successfully.
 )
 
-:: 2. Download and Install Suricata
+:: 2. Check and Install Npcap (Required for packet capture on Windows)
+echo [*] Checking for Npcap...
+if not exist "C:\Windows\System32\Npcap" (
+    echo [*] Npcap not found. Downloading Npcap installer...
+    powershell -Command "Invoke-WebRequest -Uri 'https://npcap.com/dist/npcap-1.79.exe' -OutFile '%TEMP%\npcap_installer.exe'"
+    
+    if not exist "%TEMP%\npcap_installer.exe" (
+        echo [!] ERROR: Failed to download Npcap. Check internet.
+        goto error
+    )
+
+    echo [*] Installing Npcap silently (Admin privileges required)...
+    "%TEMP%\npcap_installer.exe" /S
+    echo [+] Npcap installation completed!
+) else (
+    echo [+] Npcap is already installed.
+)
+
+:: 3. Download and Install Suricata
 echo [*] Checking/Downloading Suricata...
 if not exist "C:\Program Files\Suricata" (
     powershell -Command "Invoke-WebRequest -Uri 'https://www.openinfosecfoundation.org/downloads/windows/Suricata-7.0.6-1-64bit.msi' -OutFile '%TEMP%\suricata.msi'"
+    
+    if not exist "%TEMP%\suricata.msi" (
+        echo [!] ERROR: Failed to download Suricata. Check internet.
+        goto error
+    )
+
     msiexec.exe /i "%TEMP%\suricata.msi" /quiet /norestart
     echo [+] Suricata installed successfully!
 ) else (
     echo [+] Suricata is already installed.
 )
 
-:: 3. Install Python Dependencies
+:: 4. Install Python Dependencies
 echo [*] Installing required Python libraries...
 python -m pip install --upgrade pip
 python -m pip install requests
 
-:: 4. Deploy Files
+:: 5. Deploy Files
 echo [*] Deploying agent files to C:\nids_agent\...
 if not exist "C:\nids_agent" mkdir C:\nids_agent
 
