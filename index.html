@@ -229,19 +229,17 @@
                     </table>
                 </div>
             </section>
-<!-- OS Download Center Section -->
+<!-- OS Download Center & Guide Section -->
 <section id="downloads" class="glass rounded-2xl p-4 md:p-8 mb-10">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
             <h3 class="font-bold font-cyber uppercase tracking-widest text-xs md:text-sm text-white">Sensor Deployment Center</h3>
-            <p class="text-slate-400 text-xs">Deploy the sensor instantly on Linux using the automated script or configure it for Windows.</p>
+            <p class="text-slate-400 text-xs">Deploy the sensor instantly on Linux using the automated script.</p>
         </div>
     </div>
 
-    <!-- Dual Grid Cards for Linux and Windows -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        
-        <!-- Linux Quick Deploy Card -->
+    <!-- Linux Quick Deploy Card -->
+    <div class="max-w-xl mx-auto mb-8">
         <div class="bg-gradient-to-b from-slate-900/80 to-slate-950 border border-red-900/40 rounded-2xl p-6 flex flex-col justify-between shadow-lg shadow-red-950/20 hover:border-red-700/60 transition duration-300">
             <div>
                 <div class="flex items-center justify-between mb-4">
@@ -262,30 +260,56 @@
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Windows Deployment Card -->
-        <div class="bg-gradient-to-b from-slate-900/80 to-slate-950 border border-blue-900/40 rounded-2xl p-6 flex flex-col justify-between shadow-lg shadow-blue-950/20 hover:border-blue-700/60 transition duration-300">
-            <div>
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-950/80 border border-blue-800/50 flex items-center justify-center text-blue-400 text-xl shadow-inner">
-                        <i class="fab fa-windows"></i>
-                    </div>
-                    <span class="text-[10px] bg-blue-950/90 text-blue-300 border border-blue-800/60 px-3 py-1 rounded-full font-bold uppercase tracking-wider">Windows Deployment</span>
-                </div>
-                <h4 class="font-bold font-cyber text-white text-base mb-1.5 uppercase tracking-wider">Automated Windows Setup</h4>
-                <p class="text-slate-400 text-xs mb-5 leading-relaxed">Clones the repository via PowerShell and automatically runs the setup batch configuration.</p>
+    <!-- Detailed Installation & Guide Section -->
+    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
+        <h4 class="font-bold font-cyber text-white text-sm mb-4 uppercase tracking-wider flex items-center gap-2">
+            <i class="fas fa-book-open text-red-400"></i> Sensor Installation & Operations Guide
+        </h4>
+        
+        <div class="space-y-6 text-xs text-slate-300">
+            <!-- Prerequisites -->
+            <div class="bg-black/40 border border-slate-800/80 rounded-xl p-4">
+                <h5 class="text-red-400 font-bold mb-2 font-cyber uppercase tracking-wider">1. Prerequisites & What Gets Installed</h5>
+                <p class="text-slate-400 leading-relaxed mb-2">The automated installation script handles dependencies automatically, setting up the following components on your Linux host:</p>
+                <ul class="list-disc list-inside space-y-1 text-slate-400 font-mono text-[11px]">
+                    <li><strong class="text-slate-200">OS:</strong> Ubuntu / Debian / Linux Mint (Recommended)</li>
+                    <li><strong class="text-slate-200">Engine:</strong> Suricata NIDS packet inspection engine</li>
+                    <li><strong class="text-slate-200">Runtime:</strong> Python 3 with required pip dependencies (Firebase integration & log parsers)</li>
+                    <li><strong class="text-slate-200">Privileges:</strong> Root / Sudo access to read network interfaces and system logs</li>
+                </ul>
             </div>
-            <div class="space-y-3">
-                <div class="p-3 bg-black/70 rounded-xl border border-slate-800 font-mono text-[10px] text-blue-400 overflow-x-auto select-all">
-                    git clone --depth 1 https://github.com/TestiJJ/Main-NIDS.git; cd Main-NIDS; .\setup.bat
+
+            <!-- Installation & Startup -->
+            <div class="bg-black/40 border border-slate-800/80 rounded-xl p-4">
+                <h5 class="text-red-400 font-bold mb-2 font-cyber uppercase tracking-wider">2. Installation & Startup Instructions</h5>
+                <ol class="list-decimal list-inside space-y-2 text-slate-400 leading-relaxed">
+                    <li>Open your Linux terminal and execute the automated clone and deploy command provided above.</li>
+                    <li>Input your system sudo password when prompted so the script can configure network hooks and dependencies.</li>
+                    <li>Authenticate your sensor node or ensure your configuration file points to your authorized Firebase UID database path.</li>
+                    <li>Start the sensor bridge service to begin harvesting logs and streaming real-time telemetry straight to your control center dashboard.</li>
+                </ol>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="bg-black/40 border border-slate-800/80 rounded-xl p-4">
+                <h5 class="text-red-400 font-bold mb-2 font-cyber uppercase tracking-wider">3. Troubleshooting & Support</h5>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                    <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                        <span class="text-yellow-400 font-bold block mb-1">Minor Errors (Path/Permission Warnings)</span>
+                        <p class="text-slate-400 text-[11px] leading-relaxed">If log paths fail or permissions deny access, ensure you are running the script with <code class="text-slate-200 font-mono">sudo</code> and that your active network interface matches your connection config (check via <code class="text-slate-200 font-mono">ip a</code>).</p>
+                    </div>
+                    <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                        <span class="text-red-400 font-bold block mb-1">Critical Errors & Support Contact</span>
+                        <p class="text-slate-400 text-[11px] leading-relaxed">If you experience persistent provisioning blocks or database sync crashes, reach out directly to the developer at <a href="mailto:testimonyjokotoye65@gmail.com" class="text-red-400 font-mono underline hover:text-red-300">testimonyjokotoye65@gmail.com</a> with your terminal error logs.</p>
+                    </div>
                 </div>
-                <button onclick="copyCommandFromElement(this)" class="w-full bg-blue-950/40 border border-blue-900/50 hover:bg-blue-900 text-blue-300 font-bold text-xs py-2.5 px-4 rounded-xl text-center uppercase tracking-wider transition flex items-center justify-center gap-2">
-                    <i class="fas fa-copy"></i> Copy Windows Command
-                </button>
             </div>
         </div>
-
     </div>
+</section>
+
 
     <!-- Troubleshooting Network Drops Guide -->
     <div class="mt-6 max-w-4xl mx-auto p-4 bg-slate-900/40 border border-slate-800 rounded-xl">
