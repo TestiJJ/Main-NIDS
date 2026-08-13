@@ -567,7 +567,8 @@ auth.onAuthStateChanged((user) => {
         initDatabaseStreams(user.uid);
         initRulesStream(user.uid);
         
-        alertsRef.on('value', (snapshot) => {
+                alertRef = database.ref(`users/${user.uid}/network_alerts`);
+        alertRef.on('value', (snapshot) => {
             const data = snapshot.val();
             const tableBody = document.getElementById('alert-table-body');
             
@@ -580,21 +581,18 @@ auth.onAuthStateChanged((user) => {
             let alertsArray = [];
 
             if (data) {
-                // Convert Firebase object map into an array with keys
                 alertsArray = Object.keys(data).map(key => ({
                     id: key,
                     ...data[key]
                 }));
 
-                // Sort array so newest timestamps appear first
                 alertsArray.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
                 alertsArray.forEach(alert => {
                     totalCount++;
-                    if (alert.severity === 1) criticalCount++;
-                    if (alert.severity === 2 || alert.severity === 3) suspiciousCount++;
+                    if (parseInt(alert.severity) === 1) criticalCount++;
+                    else suspiciousCount++;
 
-                    // Render table row
                     const row = document.createElement('tr');
                     row.className = "alert-row border-b border-slate-800/60 hover:bg-slate-900/40 transition";
                     row.innerHTML = `
@@ -602,8 +600,8 @@ auth.onAuthStateChanged((user) => {
                         <td class="p-3 md:p-4 font-mono font-bold text-slate-200">${alert.src_ip}</td>
                         <td class="p-3 md:p-4 text-slate-300 font-medium">${alert.signature}</td>
                         <td class="p-3 md:p-4">
-                            <span class="px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${alert.severity === 1 ? 'bg-red-950 text-red-400 border border-red-900' : 'bg-yellow-950 text-yellow-400 border border-yellow-900'}">
-                                ${alert.severity === 1 ? 'CRITICAL' : 'ALERT'}
+                            <span class="px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider ${parseInt(alert.severity) === 1 ? 'bg-red-950 text-red-400 border border-red-900' : 'bg-yellow-950 text-yellow-400 border border-yellow-900'}">
+                                ${parseInt(alert.severity) === 1 ? 'CRITICAL' : 'ALERT'}
                             </span>
                         </td>
                         <td class="p-3 md:p-4 text-right">
@@ -616,15 +614,11 @@ auth.onAuthStateChanged((user) => {
                 });
             }
 
-            // Update Metric Counters Safely
-            const totalEl = document.getElementById('stat-total-alerts');
-            const suspEl = document.getElementById('stat-suspicious');
-            const critEl = document.getElementById('stat-critical');
-
-            if (totalEl) totalEl.innerText = totalCount;
-            if (suspEl) suspEl.innerText = suspiciousCount;
-            if (critEl) critEl.innerText = criticalCount;
+            document.getElementById('stat-total-alerts').innerText = totalCount;
+            document.getElementById('stat-suspicious').innerText = suspiciousCount;
+            document.getElementById('stat-critical').innerText = criticalCount;
         });
+
     } else {
         authOverlay.style.display = 'flex';
         dashboardRoot.classList.add('opacity-0', 'pointer-events-none');
