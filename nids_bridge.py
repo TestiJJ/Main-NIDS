@@ -129,8 +129,14 @@ def send_critical_email(recipient_emails, payload):
     """
 
     try:
+        import socket
+        conn = socket.create_connection((SMTP_SERVER), timeout=10)  
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.sock = conn
+        server.fileobject = server.sock.makefile('rb')
+        server.ehlo()
         server.starttls()
+        server.ehlo()
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
         
         for email in recipient_emails:
