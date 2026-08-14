@@ -20,7 +20,7 @@ CONFIG_FILE = 'sensor_config.json'
 FIREBASE_WEB_API_KEY = "AIzaSyCVS9na3K2hE9yyWWJulcBKHPXFkiMRExk"
 
 SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
+SMTP_PORT = 465
 SENDER_EMAIL = "testimonyjokotoye65@gmail.com"
 SENDER_PASSWORD = "ovqscidivcalbowg"
 
@@ -129,14 +129,7 @@ def send_critical_email(recipient_emails, payload):
     """
 
     try:
-        import socket
-        conn = socket.create_connection((SMTP_SERVER), timeout=10)  
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.sock = conn
-        server.fileobject = server.sock.makefile('rb')
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
+        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
         
         for email in recipient_emails:
